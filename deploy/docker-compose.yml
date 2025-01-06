@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: facebook
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"                     # Проброс порта
+    volumes:
+      - ../data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com  # Email для входа в pgAdmin
+      PGADMIN_DEFAULT_PASSWORD: admin            # Пароль для входа в pgAdmin
+    ports:
+      - "8090:80"                               # Проброс порта
+    depends_on:
+      - db                                      # Зависимость от сервиса PostgreSQL
