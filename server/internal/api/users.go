@@ -16,7 +16,7 @@ type UserServiced interface {
 	GetUsers(context.Context) []domain.User
 	GetUser(context.Context, int) *domain.User
 	AddUser(context.Context, domain.User) (int, error)
-	UpdateUser(context.Context, int, domain.User) error
+	UpdateUser(context.Context, domain.User) error
 	Remove(context.Context, int) error
 }
 
