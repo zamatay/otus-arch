@@ -1,14 +1,12 @@
-package api
+package user
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
+	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
@@ -24,20 +22,19 @@ type User struct {
 	service UserServiced
 }
 
-const _timeout time.Duration = 2 * time.Second
-
-func NewUser(service UserServiced, config app.HttpConfig) *User {
+func NewUser(service UserServiced) *User {
 	api := new(User)
-	http.HandleFunc("/user/get_list", api.GetUsers)
-	http.HandleFunc("/user/add", api.AddUser)
-	http.HandleFunc("/user/update", api.UpdateUser)
-	http.HandleFunc("/user/get", api.GetUser)
-	http.HandleFunc("/user/remove", api.Remove)
 	api.service = service
 
-	go run(config.Host, config.Port)
-
 	return api
+}
+
+func (u *User) RegisterHandler(r srvApi.AddRouted) {
+	r.AddProtectedRoute("/user/get_list", u.GetUsers)
+	r.AddProtectedRoute("/user/add", u.AddUser)
+	r.AddProtectedRoute("/user/update", u.UpdateUser)
+	r.AddProtectedRoute("/user/get", u.GetUser)
+	r.AddProtectedRoute("/user/remove", u.Remove)
 }
 
 func run(host string, port uint16) {
@@ -49,85 +46,83 @@ func run(host string, port uint16) {
 }
 
 func (api *User) GetUsers(w http.ResponseWriter, r *http.Request) {
-	ctx, done := context.WithTimeout(context.Background(), _timeout)
+	ctx, done := srvApi.GetContext()
 	defer done()
-	err := json.NewEncoder(w).Encode(api.service.GetUsers(ctx))
-	if err != nil {
-		setError(w, err.Error(), 500)
-	}
-	w.WriteHeader(http.StatusOK)
+
+	srvApi.SetOk(w, api.service.GetUsers(ctx))
 }
 
 func (api *User) GetUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := context.WithTimeout(context.Background(), _timeout)
+	ctx, done := srvApi.GetContext()
 	defer done()
 
 	var id int
 	var err error
 	if id, err = GetId(r); err != nil {
-		setError(w, err.Error(), 500)
+		srvApi.SetError(w, err.Error(), 500)
 		return
 	}
 
-	setOk(w, api.service.GetUser(ctx, id))
+	srvApi.SetOk(w, api.service.GetUser(ctx, id))
 
 }
 
 func (api *User) AddUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := context.WithTimeout(context.Background(), _timeout)
+	ctx, done := srvApi.GetContext()
 	defer done()
 
 	user, err := GetUser(r)
 	if err != nil {
-		setError(w, err.Error(), 500)
+		srvApi.SetError(w, err.Error(), 500)
+		return
 	}
 
 	id, err := api.service.AddUser(ctx, *user)
 	if err != nil {
-		setError(w, err.Error(), 500)
+		srvApi.SetError(w, err.Error(), 500)
+		return
 	}
 
-	setOk(w, struct {
+	srvApi.SetOk(w, struct {
 		id int
 	}{id: id})
 }
 
 func (api *User) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := context.WithTimeout(context.Background(), _timeout)
+	ctx, done := srvApi.GetContext()
 	defer done()
 
-	var id int
 	var err error
-	if id, err = GetId(r); err != nil {
-		setError(w, err.Error(), 500)
-		return
-	}
 
 	user, err := GetUser(r)
 	if err != nil {
-		setError(w, err.Error(), 500)
+		srvApi.SetError(w, err.Error(), 500)
 		return
 	}
 
-	err = api.service.UpdateUser(ctx, id, *user)
+	err = api.service.UpdateUser(ctx, *user)
 	if err != nil {
-		setError(w, err.Error(), 500)
+		srvApi.SetError(w, err.Error(), 500)
 		return
 	}
 
-	setOk(w, user)
+	srvApi.SetOk(w, user)
 }
 
 func (api *User) Remove(writer http.ResponseWriter, request *http.Request) {
-	ctx, done := context.WithTimeout(context.Background(), _timeout)
+	ctx, done := srvApi.GetContext()
 	defer done()
 
 	var id int
 	var err error
 	if id, err = GetId(request); err != nil {
-		setError(writer, err.Error(), 500)
+		srvApi.SetError(writer, err.Error(), 500)
 		return
 	}
 
-	setOk(writer, api.service.Remove(ctx, id))
+	if err = api.service.Remove(ctx, id); err != nil {
+		srvApi.SetError(writer, err.Error(), http.StatusInternalServerError)
+	}
+
+	srvApi.SetOk(writer, srvApi.Ok())
 }

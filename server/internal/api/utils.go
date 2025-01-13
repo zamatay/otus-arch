@@ -1,37 +1,37 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"net/http"
-	"strconv"
-
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"time"
 )
 
-func GetId(r *http.Request) (result int, err error) {
-	idStr := r.URL.Query().Get("id")
-	if idStr == "" {
-		return 0, errors.New("id is empty")
-	}
-	return strconv.Atoi(idStr)
-}
+const _timeout time.Duration = 200 * time.Second
 
-func GetUser(r *http.Request) (user *domain.User, err error) {
-	err = json.NewDecoder(r.Body).Decode(&user)
-	return user, err
-}
+type OkResult struct{ Ok bool }
 
-func setError(writer http.ResponseWriter, errorString string, code int) {
+func SetError(writer http.ResponseWriter, errorString string, code int) {
 	http.Error(writer, errorString, code)
 }
 
-func setOk(writer http.ResponseWriter, object any) {
+func Ok() OkResult {
+	return OkResult{Ok: true}
+}
+
+func SetOk(writer http.ResponseWriter, object any) {
+	writer.Header().Set("Content-Type", "application/json")
+
 	err := json.NewEncoder(writer).Encode(object)
 	if err != nil {
-		setError(writer, err.Error(), 500)
+		SetError(writer, err.Error(), 500)
 		return
 	}
 
 	writer.WriteHeader(http.StatusOK)
+}
+
+func GetContext() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), _timeout)
+
 }

@@ -24,3 +24,5 @@ services:
       - "8090:80"                               # Проброс порта
     depends_on:
       - db                                      # Зависимость от сервиса PostgreSQL
+  app:
+    image:

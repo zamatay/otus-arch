@@ -1,5 +1,6 @@
 app:
   name: otus-arch
+  secret: my-secret
 db:
   host: localhost
   port: 5432

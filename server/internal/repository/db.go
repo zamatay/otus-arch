@@ -10,7 +10,7 @@ type Repo struct {
 	conn *pgx.Conn
 }
 
-func (r Repo) Close(ctx context.Context) error {
+func (r *Repo) Close(ctx context.Context) error {
 	return r.conn.Close(ctx)
 }
 

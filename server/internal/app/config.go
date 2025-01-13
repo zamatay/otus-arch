@@ -3,18 +3,14 @@ package app
 import (
 	"github.com/spf13/viper"
 
+	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
 )
-
-type HttpConfig struct {
-	Host string
-	Port uint16
-}
 
 type Config struct {
 	App  AppConfig
 	DB   repository.Config
-	Http HttpConfig
+	Http api.Config
 }
 
 func NewConfig() (*Config, error) {
@@ -32,5 +28,6 @@ func NewConfig() (*Config, error) {
 }
 
 type AppConfig struct {
-	Name string
+	Name   string
+	Secret string
 }
