@@ -14,6 +14,15 @@ services:
     volumes:
       - ../data:/var/lib/postgresql/data
 
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
@@ -24,5 +33,3 @@ services:
       - "8090:80"                               # Проброс порта
     depends_on:
       - db                                      # Зависимость от сервиса PostgreSQL
-  app:
-    image:

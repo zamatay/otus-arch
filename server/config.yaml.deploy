@@ -1,0 +1,12 @@
+app:
+  name: otus-arch
+  secret: my-secret
+db:
+  host: db
+  port: 5432
+  user: postgres
+  password: postgres
+  database: facebook
+http:
+  host: localhost
+  port: 8080
