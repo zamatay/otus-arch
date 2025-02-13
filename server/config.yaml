@@ -9,4 +9,4 @@ db:
   database: facebook
 http:
   host: localhost
-  port: 8080
+  port: 80
