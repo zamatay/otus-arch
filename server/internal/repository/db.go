@@ -15,7 +15,12 @@ func (r *Repo) Close(ctx context.Context) error {
 }
 
 func NewRepo(ctx context.Context, cfg Config) (*Repo, error) {
-	connect, err := pgx.Connect(ctx, cfg.GetConnectionString())
+	dsn := cfg.GetConnectionString()
+	return NewRepoByStr(ctx, dsn)
+}
+
+func NewRepoByStr(ctx context.Context, dsn string) (*Repo, error) {
+	connect, err := pgx.Connect(ctx, dsn)
 	if err != nil {
 		return nil, err
 	}

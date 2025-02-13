@@ -3,14 +3,17 @@ package repository
 import (
 	"context"
 	"log/slog"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
+const selectUsers = "select id, login, first_name, last_name, birthday, gender_id, city, enabled, interests from users"
+
 func (r *Repo) GetUsers(ctx context.Context) []domain.User {
-	rows, err := r.conn.Query(ctx, "select id, login, first_name, last_name, birthday, gender_id, city, enabled, interests from users limit 100")
+	rows, err := r.conn.Query(ctx, selectUsers+" limit 100")
 	if err != nil {
 		return nil
 	}
@@ -30,12 +33,12 @@ func (r *Repo) GetUsers(ctx context.Context) []domain.User {
 }
 
 func (r *Repo) GetUser(ctx context.Context, id int) *domain.User {
-	row := r.conn.QueryRow(ctx, "select id, login, first_name, last_name, birthday, gender_id, city, enabled, interests from users where id=$1", id)
+	row := r.conn.QueryRow(ctx, " where id=$1", id)
 	return GetUserByRow(row)
 }
 
 func (r *Repo) GetUserIdByLogin(ctx context.Context, login string) *domain.User {
-	row := r.conn.QueryRow(ctx, `select id, login, first_name, last_name, birthday, gender_id, city, enabled, interests  from users where login = $1`, login)
+	row := r.conn.QueryRow(ctx, selectUsers+` where login = $1`, login)
 	return GetUserByRow(row)
 }
 
@@ -69,4 +72,26 @@ func (r *Repo) UpdateUser(ctx context.Context, user domain.User) error {
 func (r *Repo) Remove(ctx context.Context, id int) error {
 	_, err := r.conn.Exec(ctx, "delete from users where id=$1", id)
 	return err
+}
+
+func (r *Repo) SearchUser(ctx context.Context, firstName string, lastName string) ([]domain.User, error) {
+	rows, err := r.conn.Query(ctx, selectUsers+" where first_name ilike $1 and last_name ilike $2 limit 100", addPercent(firstName), addPercent(lastName))
+	if err != nil {
+		return nil, err
+	}
+	users := make([]domain.User, 0, 100)
+	for rows.Next() {
+		user := GetUserByRow(rows)
+		if user != nil {
+			users = append(users, *user)
+		}
+	}
+	return users, nil
+}
+
+func addPercent(name string) string {
+	if strings.HasSuffix(name, "%") {
+		return name
+	}
+	return name + "%"
 }

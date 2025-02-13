@@ -16,12 +16,33 @@ services:
 
   app:
     build:
-      context: ./server
+      context: ./../server
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - db
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    ports:
+      - '4000:3000'
+    volumes:
+      - grafana:/var/lib/grafana
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -33,3 +54,5 @@ services:
       - "8090:80"                               # Проброс порта
     depends_on:
       - db                                      # Зависимость от сервиса PostgreSQL
+volumes:
+  grafana:
