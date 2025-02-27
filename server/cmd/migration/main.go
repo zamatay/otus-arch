@@ -3,14 +3,17 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"os"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/brianvoe/gofakeit/v7"
 	_ "github.com/jackc/pgx/v5/stdlib"
+
+	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
 )
 
 var (
@@ -27,16 +30,34 @@ type Person struct {
 	City      string    `fake:"{city}"` // Comma separated for multiple values
 }
 
-func main() {
+func getConnectionString() string {
 	flags.Parse(os.Args[1:])
 	args := flags.Args()
 
-	if len(args) == 0 {
-		flags.Usage()
-		return
-	}
 	var dbstring string
-	dbstring = args[0]
+	if len(args) == 0 {
+		config, err := app.NewConfig()
+		if err != nil {
+			return ""
+		}
+
+		if dbstring = config.DB.GetConnectionString(); dbstring != "" {
+			return dbstring
+		}
+
+		flags.Usage()
+		return ""
+	} else {
+		dbstring = args[0]
+	}
+	return dbstring
+}
+
+func main() {
+	dbstring := getConnectionString()
+	if dbstring == "" {
+		log.Fatal("Ошибка при инициализации репозитория")
+	}
 
 	//db, err := goose.OpenDBWithDriver(driver, dbstring)
 	ctx := context.Background()
@@ -45,9 +66,9 @@ func main() {
 		log.Fatalf("goose: failed to open DB: %v\n", err)
 	}
 
-	if _, err := db.Exec(ctx, "delete from public.users"); err != nil {
-		log.Fatalf("goose: failed to truncate users: %v\n", err)
-	}
+	//if _, err := db.Exec(ctx, "delete from public.users"); err != nil {
+	//	log.Fatalf("goose: failed to truncate users: %v\n", err)
+	//}
 
 	defer func() {
 		db.Close()

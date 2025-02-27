@@ -5,7 +5,7 @@ services:
     image: postgres:latest
     container_name: postgres_db
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ma
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: facebook
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -17,11 +17,23 @@ services:
   app:
     build:
       context: ./../server
-      dockerfile: Dockerfile
+      dockerfile: ./../deploy/app/Dockerfile
+    container_name: app_deploy
     ports:
       - "8081:80"
     depends_on:
       - db
+    volumes:
+      - ../server/config.yaml.deploy:/api/config.yaml
+  migration:
+    build:
+      context: ./../server
+      dockerfile: ./../deploy/migrate/Dockerfile
+    container_name: migration_deploy
+    depends_on:
+      - db
+    volumes:
+      - ../server/config.yaml.deploy:/api/config.yaml
 
   prometheus:
     image: prom/prometheus

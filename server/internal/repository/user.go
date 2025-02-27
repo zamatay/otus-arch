@@ -75,7 +75,7 @@ func (r *Repo) Remove(ctx context.Context, id int) error {
 }
 
 func (r *Repo) SearchUser(ctx context.Context, firstName string, lastName string) ([]domain.User, error) {
-	rows, err := r.conn.Query(ctx, selectUsers+" where first_name ilike $1 and last_name ilike $2 limit 100", addPercent(firstName), addPercent(lastName))
+	rows, err := r.conn.Query(ctx, selectUsers+" where left(first_name, 3) = left($1, 3) and left(last_name, 3) = left($2, 3) limit 100", firstName, lastName)
 	if err != nil {
 		return nil, err
 	}

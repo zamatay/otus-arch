@@ -28,3 +28,11 @@ run:
 	@echo "Starting deploy"
 	docker-compose -f $(DEPLOY_DIR)/docker-compose.yml up -d
 	@echo "end deploy"
+stop:
+	@echo "Starting down"
+	docker-compose -f $(DEPLOY_DIR)/docker-compose.yml down
+	@echo "end down"
+build:
+	@echo "Starting build"
+	docker-compose -f $(DEPLOY_DIR)/docker-compose.yml build
+	@echo "end build"
