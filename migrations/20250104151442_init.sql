@@ -10,13 +10,13 @@ values ('Мужской'), ('Женский');
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    login varchar(50) not null ,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
+    login varchar(20) not null ,
+    first_name varchar(15) NOT NULL,
+    last_name varchar(15) NOT NULL,
     birthday DATE NULL,
     gender_id INT REFERENCES genders(id) ON DELETE SET NULL,
-    interests TEXT[],
-    city VARCHAR(100),
+    interests varchar(50)[],
+    city varchar(20),
     enabled BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
@@ -33,7 +33,7 @@ CREATE TABLE user_credentials (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE user_credentials
+DROP TABLE user_credentials;
 DROP TABLE users;
-DROP TABLE  genders
+DROP TABLE  genders;
 -- +goose StatementEnd

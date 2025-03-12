@@ -3,15 +3,16 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Repo struct {
-	conn *pgx.Conn
+	conn *pgxpool.Pool
 }
 
 func (r *Repo) Close(ctx context.Context) error {
-	return r.conn.Close(ctx)
+	r.conn.Close()
+	return nil
 }
 
 func NewRepo(ctx context.Context, cfg Config) (*Repo, error) {
@@ -20,7 +21,8 @@ func NewRepo(ctx context.Context, cfg Config) (*Repo, error) {
 }
 
 func NewRepoByStr(ctx context.Context, dsn string) (*Repo, error) {
-	connect, err := pgx.Connect(ctx, dsn)
+	connect, err := pgxpool.New(ctx, dsn)
+	connect.Config().MaxConns = 1000
 	if err != nil {
 		return nil, err
 	}
