@@ -33,7 +33,7 @@ func (r *Repo) GetUsers(ctx context.Context) []domain.User {
 }
 
 func (r *Repo) GetUser(ctx context.Context, id int) *domain.User {
-	row := r.conn.QueryRow(ctx, " where id=$1", id)
+	row := r.conn.QueryRow(ctx, selectUsers+" where id=$1", id)
 	return GetUserByRow(row)
 }
 

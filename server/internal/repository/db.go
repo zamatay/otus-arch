@@ -22,7 +22,7 @@ func NewRepo(ctx context.Context, cfg Config) (*Repo, error) {
 
 func NewRepoByStr(ctx context.Context, dsn string) (*Repo, error) {
 	connect, err := pgxpool.New(ctx, dsn)
-	connect.Config().MaxConns = 100
+	connect.Config().MaxConns = 1000
 	if err != nil {
 		return nil, err
 	}

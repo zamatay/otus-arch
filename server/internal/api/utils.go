@@ -20,13 +20,12 @@ func Ok() OkResult {
 }
 
 func SetOk(writer http.ResponseWriter, object any) {
-	writer.Header().Set("Content-Type", "application/json")
-
 	err := json.NewEncoder(writer).Encode(object)
 	if err != nil {
 		SetError(writer, err.Error(), 500)
 		return
 	}
+	writer.Header().Set("Content-Type", "application/json")
 
 	writer.WriteHeader(http.StatusOK)
 }
