@@ -23,19 +23,19 @@ func main() {
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
-	repo, err := repository.NewRepo(ctx, config.DB)
+	repoR, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
 	if err != nil {
 		log.Fatal("Ошибка при инициализации репозитория", err)
 	}
-	_ = repo
+	_ = repoR
 
 	service, err := api.New(&config.Http, config.App.Secret)
 	if err != nil {
 		return
 	}
-	u := user.NewUser(repo)
+	u := user.NewUser(repoR)
 	u.RegisterHandler(service)
-	a := auth.NewAuth(repo, config.App.Secret)
+	a := auth.NewAuth(repoR, config.App.Secret)
 	a.RegisterHandler(service)
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)
@@ -51,7 +51,7 @@ func main() {
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		return repo.Close(ctx)
+		return repoR.Close(ctx)
 	})
 	eg.Go(func() error {
 		return service.Stop(ctx)

@@ -2,11 +2,24 @@ app:
   name: otus-arch
   secret: my-secret
 db:
-  host: localhost
-  port: 5432
-  user: postgres
-  password: postgres
-  database: facebook
+  read:
+    - host: localhost
+      port: 6433
+      user: postgres
+      password: postgres
+      database: facebook
+    - host: localhost
+      port: 6434
+      user: postgres
+      password: postgres
+      database: facebook
+  write:
+    - host: localhost
+      port: 6432
+      user: postgres
+      password: postgres
+      database: facebook
+
 #  host: "10.0.1.240"
 #  user: "stocks_api"
 #  database: "stocks_api"
