@@ -6,6 +6,7 @@ require (
 	github.com/brianvoe/gofakeit/v7 v7.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/jmoiron/sqlx v1.4.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.33.0

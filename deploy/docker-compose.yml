@@ -2,66 +2,90 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
-    container_name: postgres_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: facebook
-      PGDATA: /var/lib/postgresql/data/pgdata
+    container_name: pg-1
+    image: docker.io/bitnami/postgresql-repmgr:17
+    user: "1001"
     ports:
-      - "5432:5432"                     # Проброс порта
+      - "6432:5432"
     volumes:
-      - ../data:/var/lib/postgresql/data
+      - ../pg_1_data:/bitnami/postgresql
+      - ./create_extensions.sql:/docker-entrypoint-initdb.d/create_extensions.sql:ro
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpostgres
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=facebook
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-1
+      - REPMGR_PRIMARY_PORT=5432
+      - REPMGR_PARTNER_NODES=pg-1,pg-2,pg-3:5432
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
+      - REPMGR_PORT_NUMBER=5432
+      - REPMGR_CONNECT_TIMEOUT=1
+      - REPMGR_RECONNECT_ATTEMPTS=2
+      - REPMGR_RECONNECT_INTERVAL=1
+      - REPMGR_MASTER_RESPONSE_TIMEOUT=5
+    restart: unless-stopped
     networks:
-      - postgres-network
-    command: >
-      -c wal_level=replica
-      -c max_wal_senders=5
-      -c wal_keep_size=1GB
-      -c archive_mode=on
-      -c archive_command='test ! -f /var/lib/postgresql/data/archive/%f && cp %p /var/lib/postgresql/data/archive/%f'
+      - postgres-ha
 
-  postgres-slave1:
-    image: postgres:latest
-    container_name: postgres-slave1
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: facebook
-    volumes:
-      - ../slave1-data:/var/lib/postgresql/data
+  pg-2:
+    container_name: postgres_2
+    image: docker.io/bitnami/postgresql-repmgr:17
+    user: "1001"
     ports:
-      - "5433:5432"
-    networks:
-      - postgres-network
-    depends_on:
-      - db
-    command: >
-      -c hot_standby=on
-      -c primary_conninfo='host=postgres_db port=5432 user=postgres password=postgres'
-      -c restore_command='cp /var/lib/postgresql/data/archive/%f %p'
-      -c archive_cleanup_command='pg_archivecleanup /var/lib/postgresql/data/archive %r'
-  postgres-slave2:
-    image: postgres:latest
-    container_name: postgres-slave2
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: facebook
+      - "6433:5432"
     volumes:
-      - ./slave2-data:/var/lib/postgresql/data
-    ports:
-      - "5434:5432"
+      - ../pg_2_data:/bitnami/postgresql
+      - ./create_extensions.sql:/docker-entrypoint-initdb.d/create_extensions.sql:ro
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpgpwd4habr
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=facebook
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-1
+      - REPMGR_PRIMARY_PORT=5432
+      - REPMGR_PARTNER_NODES=pg-1,pg-2,pg-3:5432
+      - REPMGR_NODE_NAME=pg-2
+      - REPMGR_NODE_NETWORK_NAME=pg-2
+      - REPMGR_PORT_NUMBER=5432
+      - REPMGR_CONNECT_TIMEOUT=1
+      - REPMGR_RECONNECT_ATTEMPTS=2
+      - REPMGR_RECONNECT_INTERVAL=1
+      - REPMGR_MASTER_RESPONSE_TIMEOUT=5
+    restart: unless-stopped
     networks:
-      - postgres-network
-    depends_on:
-      - db
-    command: >
-      -c hot_standby=on
-      -c primary_conninfo='host=postgres_db port=5432 user=postgres password=postgres'
-      -c restore_command='cp /var/lib/postgresql/data/archive/%f %p'
-      -c archive_cleanup_command='pg_archivecleanup /var/lib/postgresql/data/archive %r'
+      - postgres-ha
+  pg-3:
+    container_name: postgres_3
+    image: docker.io/bitnami/postgresql-repmgr:17
+    user: "1001"
+    ports:
+      - "6434:5432"
+    volumes:
+      - ../pg_3_data:/bitnami/postgresql
+      - ./create_extensions.sql:/docker-entrypoint-initdb.d/create_extensions.sql:ro
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpgpwd4habr
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=facebook
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-1
+      - REPMGR_PRIMARY_PORT=5432
+      - REPMGR_PARTNER_NODES=pg-1,pg-2,pg-3:5432
+      - REPMGR_NODE_NAME=pg-3
+      - REPMGR_NODE_NETWORK_NAME=pg-3
+      - REPMGR_PORT_NUMBER=5432
+      - REPMGR_CONNECT_TIMEOUT=1
+      - REPMGR_RECONNECT_ATTEMPTS=2
+      - REPMGR_RECONNECT_INTERVAL=1
+      - REPMGR_MASTER_RESPONSE_TIMEOUT=5
+    restart: unless-stopped
+    networks:
+      - postgres-ha
 
   app:
     build:
@@ -117,6 +141,9 @@ services:
       - db                                      # Зависимость от сервиса PostgreSQL
 volumes:
   grafana:
+  pg_1_data:
+  pg_2_data:
+  pg_3_data:
 networks:
-  postgres-network:
+  postgres-ha:
     driver: bridge

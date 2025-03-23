@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	App  AppConfig
-	DB   repository.Config
+	DB   map[string][]*repository.Config
 	Http api.Config
 }
 
