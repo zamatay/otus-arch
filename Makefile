@@ -3,7 +3,7 @@ ROOT_DIR   := $(shell pwd)
 DEPLOY_DIR = deploy
 # Определяем переменную для хранения первого параметра
 PARAM := $(word 2, $(MAKECMDGOALS))
-DB_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=5432 host=localhost"
+DB_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=6432 host=localhost"
 
 up:
 	@echo "Starting migrate"

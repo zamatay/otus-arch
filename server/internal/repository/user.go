@@ -13,7 +13,7 @@ import (
 const selectUsers = "select id, login, first_name, last_name, birthday, gender_id, city, enabled, interests from users"
 
 func (r *Repo) GetUsers(ctx context.Context) []domain.User {
-	rows, err := r.conn.Query(ctx, selectUsers+" limit 100")
+	rows, err := r.GetConnection().Query(ctx, selectUsers+" limit 100")
 	if err != nil {
 		return nil
 	}
@@ -33,12 +33,12 @@ func (r *Repo) GetUsers(ctx context.Context) []domain.User {
 }
 
 func (r *Repo) GetUser(ctx context.Context, id int) *domain.User {
-	row := r.conn.QueryRow(ctx, selectUsers+" where id=$1", id)
+	row := r.GetConnection().QueryRow(ctx, selectUsers+" where id=$1", id)
 	return GetUserByRow(row)
 }
 
 func (r *Repo) GetUserIdByLogin(ctx context.Context, login string) *domain.User {
-	row := r.conn.QueryRow(ctx, selectUsers+` where login = $1`, login)
+	row := r.GetConnection().QueryRow(ctx, selectUsers+` where login = $1`, login)
 	return GetUserByRow(row)
 }
 
@@ -54,7 +54,7 @@ func GetUserByRow(row pgx.Row) (u *domain.User) {
 }
 
 func (r *Repo) AddUser(ctx context.Context, user domain.User) (int, error) {
-	row := r.conn.QueryRow(ctx, `insert into users(login, first_name, last_name, birthday, gender_id, city, enabled) 
+	row := r.GetConnection().QueryRow(ctx, `insert into users(login, first_name, last_name, birthday, gender_id, city, enabled) 
 		values($1,$2,$3,$4,$5,$6,$7) RETURNING id`, user.Login, user.FirstName, user.LastName, user.Birthday, user.GenderID, user.City, user.Enabled)
 	var id int
 	if err := row.Scan(&id); err != nil {
@@ -64,18 +64,18 @@ func (r *Repo) AddUser(ctx context.Context, user domain.User) (int, error) {
 }
 
 func (r *Repo) UpdateUser(ctx context.Context, user domain.User) error {
-	_, err := r.conn.Exec(ctx, `update users set first_name = $2, last_name = $3, birthday = $4, gender_id = $5, city = $6, enabled = $7, interests=$8 where id=$1`,
+	_, err := r.GetWriteConnection().Exec(ctx, `update users set first_name = $2, last_name = $3, birthday = $4, gender_id = $5, city = $6, enabled = $7, interests=$8 where id=$1`,
 		user.ID, user.FirstName, user.LastName, user.Birthday, user.GenderID, user.City, user.Enabled, user.Interests)
 	return err
 }
 
 func (r *Repo) Remove(ctx context.Context, id int) error {
-	_, err := r.conn.Exec(ctx, "delete from users where id=$1", id)
+	_, err := r.GetWriteConnection().Exec(ctx, "delete from users where id=$1", id)
 	return err
 }
 
 func (r *Repo) SearchUser(ctx context.Context, firstName string, lastName string) ([]domain.User, error) {
-	rows, err := r.conn.Query(ctx, selectUsers+" where left(first_name, 3) = left($1, 3) and left(last_name, 3) = left($2, 3) limit 100", firstName, lastName)
+	rows, err := r.GetConnection().Query(ctx, selectUsers+" where left(first_name, 3) = left($1, 3) and left(last_name, 3) = left($2, 3) limit 100", firstName, lastName)
 	if err != nil {
 		return nil, err
 	}

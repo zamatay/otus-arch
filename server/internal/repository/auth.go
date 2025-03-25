@@ -18,7 +18,7 @@ func (r *Repo) Login(ctx context.Context, name, password string) (string, error)
 		return "", errors.New("Пользователь не найден")
 	}
 
-	row := r.conn.QueryRow(ctx, "Select password_hash from user_credentials where user_id = $1", user.ID)
+	row := r.GetConnection().QueryRow(ctx, "Select password_hash from user_credentials where user_id = $1", user.ID)
 	var passwordHash string
 	if err := row.Scan(&passwordHash); err != nil {
 		return "", err
@@ -40,7 +40,7 @@ func (r *Repo) Register(ctx context.Context, user domain.RegisterUser) error {
 		return errors.New("Пароль не прошел валидацию")
 	}
 
-	tx, err := r.conn.BeginTx(ctx, pgx.TxOptions{})
+	tx, err := r.GetWriteConnection().BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
 	}
