@@ -12,6 +12,8 @@ import (
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api/auth"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/api/friend"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/api/post"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
@@ -23,20 +25,19 @@ func main() {
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
-	repoR, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
+	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
 	if err != nil {
 		log.Fatal("Ошибка при инициализации репозитория", err)
 	}
-	_ = repoR
 
 	service, err := api.New(&config.Http, config.App.Secret)
 	if err != nil {
 		return
 	}
-	u := user.NewUser(repoR)
-	u.RegisterHandler(service)
-	a := auth.NewAuth(repoR, config.App.Secret)
-	a.RegisterHandler(service)
+	user.NewUser(repo, service)
+	auth.NewAuth(repo, service, config.App.Secret)
+	friend.NewFriend(repo, service)
+	post.NewPost(repo, service)
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)
 	}
@@ -51,7 +52,7 @@ func main() {
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		return repoR.Close(ctx)
+		return repo.Close(ctx)
 	})
 	eg.Go(func() error {
 		return service.Stop(ctx)

@@ -21,7 +21,7 @@ type Auth struct {
 }
 
 func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext()
+	ctx, done := srvApi.GetContext(nil)
 	defer done()
 
 	var au domain.AuthUser
@@ -41,7 +41,7 @@ func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext()
+	ctx, done := srvApi.GetContext(nil)
 	defer done()
 
 	var u domain.RegisterUser
@@ -59,9 +59,11 @@ func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
 	srvApi.SetOk(w, srvApi.Ok())
 }
 
-func NewAuth(service AuthServiced, secret string) *Auth {
+func NewAuth(service AuthServiced, s *srvApi.Service, secret string) *Auth {
 	signingKey = []byte(secret)
-	return &Auth{service: service}
+	auth := &Auth{service: service}
+	auth.RegisterHandler(s)
+	return auth
 }
 
 func (a *Auth) RegisterHandler(r srvApi.AddRouted) {
