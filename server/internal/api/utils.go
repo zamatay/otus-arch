@@ -37,7 +37,7 @@ func SetOk(writer http.ResponseWriter, object any) {
 	}
 	writer.Header().Set("Content-Type", "application/json")
 
-	writer.WriteHeader(http.StatusOK)
+	//writer.WriteHeader(http.StatusOK)
 }
 
 func GetContext(ctx context.Context) (context.Context, context.CancelFunc) {

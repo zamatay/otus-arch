@@ -16,7 +16,9 @@ import (
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api/post"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 func main() {
@@ -25,11 +27,15 @@ func main() {
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
+
 	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
 	if err != nil {
 		log.Fatal("Ошибка при инициализации репозитория", err)
 	}
 
+	cache, err := redis.NewCache(ctx, config.Cache)
+
+	producer, err := kafka.NewProducer(config.Kafka)
 	service, err := api.New(&config.Http, config.App.Secret)
 	if err != nil {
 		return
@@ -37,7 +43,7 @@ func main() {
 	user.NewUser(repo, service)
 	auth.NewAuth(repo, service, config.App.Secret)
 	friend.NewFriend(repo, service)
-	post.NewPost(repo, service)
+	post.NewPost(repo, cache, service, producer)
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)
 	}
