@@ -22,8 +22,11 @@ import (
 )
 
 func main() {
-	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	ctx, done := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer done()
+
 	config, err := app.NewConfig()
+	slog.Info("Загрузили конфиг", "config", config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
@@ -51,8 +54,8 @@ func main() {
 	slog.Info("Приложение запустилось", slog.Uint64("port", uint64(config.Http.Port)))
 	slog.Info("Поступил сигнал на завершение", slog.Any("done", <-ctx.Done()))
 
-	ctx, done := context.WithTimeout(context.Background(), 5*time.Second)
-	defer done()
+	ctx, doneTimeout := context.WithTimeout(context.Background(), 5*time.Second)
+	defer doneTimeout()
 
 	slog.Info("Приложение начало закрываться")
 

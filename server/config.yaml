@@ -20,11 +20,6 @@ db:
       password: postgres
       database: facebook
 
-#  host: "10.0.1.240"
-#  user: "stocks_api"
-#  database: "stocks_api"
-#  port: 5433
-#  password: "OrnT55FxHu8G-"
 http:
   host: localhost
   port: 8080
