@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"log"
+	"math/rand/v2"
 	"os"
 	"time"
 
@@ -29,6 +30,12 @@ type Person struct {
 	Interests []string  `fake:"{hobby}"`
 	City      string    `fake:"{city}"` // Comma separated for multiple values
 }
+type Post struct {
+	UserId string
+	Text   string
+}
+
+var db *pgxpool.Pool
 
 func getConnectionString() string {
 	flags.Parse(os.Args[1:])
@@ -41,7 +48,8 @@ func getConnectionString() string {
 			return ""
 		}
 
-		if dbstring = config.DB.GetConnectionString(); dbstring != "" {
+		cfg := config.DB["write"]
+		if dbstring = cfg[0].GetConnectionString(); dbstring != "" {
 			return dbstring
 		}
 
@@ -61,7 +69,8 @@ func main() {
 
 	//db, err := goose.OpenDBWithDriver(driver, dbstring)
 	ctx := context.Background()
-	db, err := pgxpool.New(ctx, dbstring)
+	var err error
+	db, err = pgxpool.New(ctx, dbstring)
 	if err != nil {
 		log.Fatalf("goose: failed to open DB: %v\n", err)
 	}
@@ -76,15 +85,60 @@ func main() {
 		//	log.Fatalf("goose: failed to close DB: %v\n", err)
 		//}
 	}()
-	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
+
+	err = insertUser(ctx)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
+	err = insertPost(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func insertPost(ctx context.Context) error {
+	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	var countData = 1_000_000
+	var countColumn = 3
+	type rowStruct []interface{}
+	bulk := make([][]any, 0, countData)
+	for range countData {
+		var post Post
+		row := make(rowStruct, countColumn)
+		err := gofakeit.Struct(&post)
+		if err != nil {
+			return err
+		}
+		idx := 0
+		row[idx] = rand.IntN(countData-1) + 1
+		row[idx+1] = gofakeit.LoremIpsumParagraph(gofakeit.RandomInt([]int{3, 4, 5}), 2, 10, " ")
+		row[idx+2] = time.Now()
+		bulk = append(bulk, row)
+	}
+	from, err := tx.CopyFrom(ctx, pgx.Identifier{"public", "posts"}, []string{"user_id", "text", "created_at"}, pgx.CopyFromRows(bulk))
+	if err != nil {
+		return err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+	log.Printf("Вставили %d строк", from)
+	return nil
+}
+
+func insertUser(ctx context.Context) error {
+	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
 	startDate := time.Date(1950, 1, 1, 0, 0, 0, 0, time.UTC) // Начальная дата
 	endDate := time.Date(2000, 12, 31, 0, 0, 0, 0, time.UTC) // Конечная дата
 	// Создание экземпляра структуры
-
 	var countColumn = 10
 	var countData = 1_000_000
 	type rowStruct []interface{}
@@ -96,7 +150,7 @@ func main() {
 
 		err := gofakeit.Struct(&person)
 		if err != nil {
-			return
+			return err
 		}
 
 		idx := 0
@@ -116,13 +170,14 @@ func main() {
 
 	from, err := tx.CopyFrom(ctx, pgx.Identifier{"public", "users"}, []string{"enabled", "login", "first_name", "last_name", "birthday", "gender_id", "interests", "city", "created_at", "updated_at"}, pgx.CopyFromRows(bulk))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.Printf("Вставили %d строк", from)
 
 	if err := tx.Commit(ctx); err != nil {
-		log.Fatalf("goose: failed to commit transaction: %v\n", err)
+		return err
 	}
+	return nil
 }
 
 func GetGender(id string) int {

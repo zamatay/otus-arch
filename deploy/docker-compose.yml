@@ -29,7 +29,6 @@ services:
     restart: unless-stopped
     networks:
       - postgres-ha
-
   pg-2:
     container_name: postgres_2
     image: docker.io/bitnami/postgresql-repmgr:17
@@ -86,6 +85,21 @@ services:
     restart: unless-stopped
     networks:
       - postgres-ha
+  
+  redis:
+    image: redis:7.2-alpine
+#    image: valkey/valkey:8.1
+    container_name: production_redis
+    ports:
+      - "6389:6379"
+    environment:
+      - REDIS_PASSWORD=redis
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   app:
     build:
@@ -96,17 +110,66 @@ services:
       - "8081:80"
     depends_on:
       - db
+      - pg-2
+      - pg-3
+      - redis
+      - kafka
     volumes:
       - ../server/config.yaml.deploy:/api/config.yaml
-  migration:
+#  migration:
+#    build:
+#      context: ./../server
+#      dockerfile: ./../deploy/migrate/Dockerfile
+#    container_name: migration_deploy
+#    depends_on:
+#      - db
+#    volumes:
+#      - ../server/config.yaml.deploy:/api/config.yaml
+  consumer:
     build:
       context: ./../server
-      dockerfile: ./../deploy/migrate/Dockerfile
-    container_name: migration_deploy
+      dockerfile: ./../deploy/consumer/Dockerfile
+    container_name: consumer_deploy
     depends_on:
       - db
     volumes:
       - ../server/config.yaml.deploy:/api/config.yaml
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"  # Для внешнего доступа
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.30.0
+    container_name: kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"  # Web-интерфейс
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"  # Внутренний адрес Kafka
+      JVM_OPTS: "-Xms32M -Xmx64M"
+      SERVER_SERVLET_CONTEXT_PATH: "/"
+      
 
   prometheus:
     image: prom/prometheus
@@ -117,7 +180,6 @@ services:
       - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -128,7 +190,6 @@ services:
       - '4000:3000'
     volumes:
       - grafana:/var/lib/grafana
-
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin

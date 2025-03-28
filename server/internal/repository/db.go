@@ -16,6 +16,7 @@ func (r *Repo) Close(ctx context.Context) error {
 	for _, pool := range r.balancer.GetAllReplica() {
 		pool.Close()
 	}
+	r.writeConn.Close()
 	return nil
 }
 

@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
+
+	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type HandleFunc func(http.ResponseWriter, *http.Request)
@@ -26,8 +29,8 @@ func TokenMiddleware(next HandleFunc, secretKey []byte) HandleFunc {
 			return
 
 		}
-		// Проверка токена
-		token, err := jwt.Parse(a[1], func(token *jwt.Token) (any, error) {
+
+		token, err := jwt.ParseWithClaims(a[1], &domain.UserClaims{}, func(token *jwt.Token) (any, error) {
 			// Проверка метода подписи
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -40,7 +43,15 @@ func TokenMiddleware(next HandleFunc, secretKey []byte) HandleFunc {
 			return
 		}
 
+		user, ok := token.Claims.(*domain.UserClaims)
+		if !ok {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "auth", user)
+
 		// Если токен действителен, передаем управление следующему обработчику
-		next(w, r)
+		next(w, r.WithContext(ctx))
 	}
 }

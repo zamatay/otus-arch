@@ -23,10 +23,10 @@ type User struct {
 	service UserServiced
 }
 
-func NewUser(service UserServiced) *User {
+func NewUser(service UserServiced, s *srvApi.Service) *User {
 	api := new(User)
 	api.service = service
-
+	api.RegisterHandler(s)
 	return api
 }
 

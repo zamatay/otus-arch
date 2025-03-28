@@ -1,12 +1,13 @@
 package user
 
 import (
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"net/http"
+
+	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
 func (api *User) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext()
+	ctx, done := srvApi.GetContext(nil)
 	defer done()
 
 	var err error

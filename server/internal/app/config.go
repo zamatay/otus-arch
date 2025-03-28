@@ -4,13 +4,17 @@ import (
 	"github.com/spf13/viper"
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 type Config struct {
-	App  AppConfig
-	DB   map[string][]*repository.Config
-	Http api.Config
+	App   AppConfig
+	DB    map[string][]*repository.Config
+	Cache redis.Config
+	Http  api.Config
+	Kafka kafka.Config
 }
 
 func NewConfig() (*Config, error) {

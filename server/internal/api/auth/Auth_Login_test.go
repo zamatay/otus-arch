@@ -15,7 +15,7 @@ func TestLoginSuccessfullyDecodesValidJSON(t *testing.T) {
 	mockService := &mockAuthService{}
 	mockService.On("Login", mock.Anything, "testuser", "testpass").Return(nil)
 
-	auth := NewAuth(mockService, "test-secret")
+	auth := NewAuth(mockService, nil, "test-secret")
 
 	reqBody := `{"user": "testuser", "password": "testpass"}`
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(reqBody))
@@ -33,7 +33,7 @@ func TestLoginSuccessfullyDecodesValidJSON(t *testing.T) {
 func TestLoginHandlesMalformedJSON(t *testing.T) {
 	// Arrange
 	mockService := &mockAuthService{}
-	auth := NewAuth(mockService, "test-secret")
+	auth := NewAuth(mockService, nil, "test-secret")
 
 	reqBody := `{"user": "testuser", "password": ` // malformed JSON
 	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(reqBody))

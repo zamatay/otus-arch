@@ -6,7 +6,7 @@ import (
 )
 
 func (api *User) SearchUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext()
+	ctx, done := srvApi.GetContext(nil)
 	defer done()
 
 	firstName, err := GetByName(r, "first_name")
