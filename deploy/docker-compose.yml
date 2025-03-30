@@ -116,15 +116,15 @@ services:
       - kafka
     volumes:
       - ../server/config.yaml.deploy:/api/config.yaml
-#  migration:
-#    build:
-#      context: ./../server
-#      dockerfile: ./../deploy/migrate/Dockerfile
-#    container_name: migration_deploy
-#    depends_on:
-#      - db
-#    volumes:
-#      - ../server/config.yaml.deploy:/api/config.yaml
+  migration:
+    build:
+      context: ./../server
+      dockerfile: ./../deploy/migrate/Dockerfile
+    container_name: migration_deploy
+    depends_on:
+      - db
+    volumes:
+      - ../server/config.yaml.deploy:/api/config.yaml
   consumer:
     build:
       context: ./../server
