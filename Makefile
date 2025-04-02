@@ -4,10 +4,12 @@ DEPLOY_DIR = deploy
 # Определяем переменную для хранения первого параметра
 PARAM := $(word 2, $(MAKECMDGOALS))
 DB_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=6432 host=localhost"
+DB_SHARD_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=7432 host=localhost"
 
 up:
 	@echo "Starting migrate"
 	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_STRING) GOOSE_MIGRATION_DIR="migrations" goose up
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_shard" goose up
 	@echo "migrate complected"
 
 down:
@@ -26,7 +28,7 @@ create:
 run:
 	@echo "Starting run"
 	@echo "Starting deploy"
-	docker-compose -f $(DEPLOY_DIR)/docker-compose.yml up -d
+	POSTGRES_PASSWORD=postgres docker-compose -f $(DEPLOY_DIR)/docker-compose.yml up --scale worker=2 -d
 	@echo "end deploy"
 stop:
 	@echo "Starting down"

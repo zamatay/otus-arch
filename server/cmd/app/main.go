@@ -10,15 +10,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/auth"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/friend"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/post"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 func main() {
@@ -26,27 +18,18 @@ func main() {
 	defer done()
 
 	config, err := app.NewConfig()
-	slog.Info("Загрузили конфиг", "config", config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
+	slog.Info("Загрузили конфиг", "config", config)
 
-	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
+	repo, cache, producer, service, err := app.NewInfra(ctx, config)
 	if err != nil {
-		log.Fatal("Ошибка при инициализации репозитория", err)
+		log.Fatal("Ошибка при инициализации приложения", err)
 	}
 
-	cache, err := redis.NewCache(ctx, config.Cache)
+	app.RegisterApi(repo, service, cache, producer, config.App.Secret)
 
-	producer, err := kafka.NewProducer(config.Kafka)
-	service, err := api.New(&config.Http, config.App.Secret)
-	if err != nil {
-		return
-	}
-	user.NewUser(repo, service)
-	auth.NewAuth(repo, service, config.App.Secret)
-	friend.NewFriend(repo, service)
-	post.NewPost(repo, cache, service, producer)
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)
 	}
