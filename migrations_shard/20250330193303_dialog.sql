@@ -8,12 +8,9 @@ CREATE TABLE dialogs (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 -- +goose StatementEnd
--- +goose StatementBegin
-SELECT create_distributed_table('dialogs', 'from_user_id');
--- +goose StatementEnd
 
 
 -- +goose Down
 -- +goose StatementBegin
-drop table if exists dialog;
+drop table if exists dialogs;
 -- +goose StatementEnd
