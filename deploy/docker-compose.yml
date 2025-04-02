@@ -98,14 +98,19 @@ services:
       PGUSER: "${POSTGRES_USER:-postgres}"
       PGPASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
+    volumes:
+      - ./pg.conf:/etc/postgresql/postgresql.conf
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+
   worker:
     image: "citusdata/citus:13.0.3"
     labels: [ "com.citusdata.role=Worker" ]
     depends_on: [ manager ]
     environment: *AUTH
-    command: "/wait-for-manager.sh"
+    command: ["/wait-for-manager.sh", "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
     volumes:
       - healthcheck-volume:/healthcheck
+      - ./pg.conf:/etc/postgresql/postgresql.conf
   manager:
     container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
     image: "citusdata/membership-manager:0.3.0"
