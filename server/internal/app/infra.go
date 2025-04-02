@@ -10,7 +10,7 @@ import (
 )
 
 func NewInfra(ctx context.Context, config *Config) (*repository.Repo, *redis.Cache, *kafka.Producer, *api.Service, error) {
-	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"])
+	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"], config.DB["shard"])
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

@@ -19,13 +19,13 @@ services:
       - REPMGR_PRIMARY_HOST=pg-1
       - REPMGR_PRIMARY_PORT=5432
       - REPMGR_PARTNER_NODES=pg-1,pg-2,pg-3:5432
-      - REPMGR_NODE_NAME=pg-1
-      - REPMGR_NODE_NETWORK_NAME=pg-1
       - REPMGR_PORT_NUMBER=5432
       - REPMGR_CONNECT_TIMEOUT=1
       - REPMGR_RECONNECT_ATTEMPTS=2
       - REPMGR_RECONNECT_INTERVAL=1
       - REPMGR_MASTER_RESPONSE_TIMEOUT=5
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
     restart: unless-stopped
     networks:
       - postgres-ha
@@ -47,13 +47,13 @@ services:
       - REPMGR_PRIMARY_HOST=pg-1
       - REPMGR_PRIMARY_PORT=5432
       - REPMGR_PARTNER_NODES=pg-1,pg-2,pg-3:5432
-      - REPMGR_NODE_NAME=pg-2
-      - REPMGR_NODE_NETWORK_NAME=pg-2
       - REPMGR_PORT_NUMBER=5432
       - REPMGR_CONNECT_TIMEOUT=1
       - REPMGR_RECONNECT_ATTEMPTS=2
       - REPMGR_RECONNECT_INTERVAL=1
       - REPMGR_MASTER_RESPONSE_TIMEOUT=5
+      - REPMGR_NODE_NAME=pg-2
+      - REPMGR_NODE_NETWORK_NAME=pg-2
     restart: unless-stopped
     networks:
       - postgres-ha
@@ -69,7 +69,7 @@ services:
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=adminpgpwd4habr
       - POSTGRESQL_USERNAME=postgres
-      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRESQL_DATABASE=facebook
       - REPMGR_PASSWORD=repmgrpassword
       - REPMGR_PRIMARY_HOST=pg-1
@@ -85,6 +85,36 @@ services:
     restart: unless-stopped
     networks:
       - postgres-ha
+
+  master:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_master"
+    image: "citusdata/citus:13.0.3"
+    ports: [ "${COORDINATOR_EXTERNAL_PORT:-7432}:5432" ]
+    labels: [ "com.citusdata.role=Master" ]
+    environment: &AUTH
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB:-facebook}"
+      PGUSER: "${POSTGRES_USER:-postgres}"
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
+  worker:
+    image: "citusdata/citus:13.0.3"
+    labels: [ "com.citusdata.role=Worker" ]
+    depends_on: [ manager ]
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+  manager:
+    container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
+    image: "citusdata/membership-manager:0.3.0"
+    volumes:
+      - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - healthcheck-volume:/healthcheck
+    depends_on: [ master ]
+    environment: *AUTH
+
   
   redis:
     image: redis:7.2-alpine
@@ -205,6 +235,7 @@ volumes:
   pg_1_data:
   pg_2_data:
   pg_3_data:
+  healthcheck-volume:
 networks:
   postgres-ha:
     driver: bridge

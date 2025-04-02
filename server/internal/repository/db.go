@@ -10,6 +10,7 @@ import (
 type Repo struct {
 	balancer  *RandomBalancer
 	writeConn *pgxpool.Pool
+	shardConn *pgxpool.Pool
 }
 
 func (r *Repo) Close(ctx context.Context) error {
@@ -20,7 +21,7 @@ func (r *Repo) Close(ctx context.Context) error {
 	return nil
 }
 
-func NewRepo(ctx context.Context, cfg []*Config, writeConfig []*Config) (*Repo, error) {
+func NewRepo(ctx context.Context, cfg []*Config, writeConfig []*Config, shardConfig []*Config) (*Repo, error) {
 	repo := new(Repo)
 	repo.balancer = NewRandomBalancer()
 	for _, config := range cfg {
@@ -45,6 +46,19 @@ func NewRepo(ctx context.Context, cfg []*Config, writeConfig []*Config) (*Repo, 
 		repo.writeConn = connection
 	}
 
+	if len(shardConfig) == 0 {
+		return nil, fmt.Errorf("Не указаны конфигурации для шарда")
+	}
+
+	for _, config := range shardConfig {
+		dsn := config.GetConnectionString()
+		connection, err := NewConnection(ctx, dsn)
+		if err != nil {
+			return nil, fmt.Errorf("Ошибка подключение к базе данных: %w", err)
+		}
+		repo.shardConn = connection
+	}
+
 	return repo, nil
 }
 
@@ -66,4 +80,7 @@ func (r *Repo) GetConnection() *pgxpool.Pool {
 
 func (r *Repo) GetWriteConnection() *pgxpool.Pool {
 	return r.writeConn
+}
+func (r *Repo) GetShardConnection() *pgxpool.Pool {
+	return r.shardConn
 }

@@ -1,14 +1,17 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE dialogs (
-    id SERIAL PRIMARY KEY,
-    from_user_id INT REFERENCES users(id) ON DELETE CASCADE,
-    to_user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    from_user_id INT,
+    to_user_id INT,
     text varchar(4000) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
 -- +goose StatementEnd
+-- +goose StatementBegin
+SELECT create_distributed_table('dialogs', 'from_user_id');
+-- +goose StatementEnd
+
 
 -- +goose Down
 -- +goose StatementBegin

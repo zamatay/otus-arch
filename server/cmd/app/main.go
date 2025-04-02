@@ -18,10 +18,10 @@ func main() {
 	defer done()
 
 	config, err := app.NewConfig()
-	slog.Info("Загрузили конфиг", "config", config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
+	slog.Info("Загрузили конфиг", "config", config)
 
 	repo, cache, producer, service, err := app.NewInfra(ctx, config)
 	if err != nil {
