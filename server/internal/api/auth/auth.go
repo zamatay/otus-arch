@@ -21,7 +21,7 @@ type Auth struct {
 }
 
 func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(context.Background())
 	defer done()
 
 	var au domain.AuthUser
