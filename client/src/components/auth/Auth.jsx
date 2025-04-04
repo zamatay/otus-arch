@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Auth = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
+    const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
@@ -10,10 +10,12 @@ const Auth = ({ onLogin }) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:8080/auth/login', {
-                username,
+                login,
                 password,
             });
             const token = response.data.token;
+            console.log(token);
+            console.log(response.data);
             localStorage.setItem('token', token);
             onLogin(token); // передаем токен в родительский компонент
         } catch (err) {
@@ -30,8 +32,8 @@ const Auth = ({ onLogin }) => {
                     <input
                         type="text"
                         id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        value={login}
+                        onChange={(e) => setLogin(e.target.value)}
                         required
                     />
                     <label htmlFor="username">Username</label>

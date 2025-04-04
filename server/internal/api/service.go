@@ -58,11 +58,11 @@ func New(config *Config, secret string) (*Service, error) {
 }
 
 func (srv *Service) AddRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, handler)
+	srv.router.HandleFunc(path, middleware.CorsMiddleware(handler))
 }
 
 func (srv *Service) AddProtectedRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.TokenMiddleware(handler, srv.secret))
+	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware(handler, srv.secret)))
 }
 
 func (srv *Service) AddHandle(path string, handler http.Handler) {
