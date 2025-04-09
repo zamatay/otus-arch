@@ -9,19 +9,19 @@ DB_SHARD_STRING := "user=postgres dbname=facebook sslmode=disable password=postg
 up:
 	@echo "Starting migrate"
 	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_STRING) GOOSE_MIGRATION_DIR="migrations" goose up
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_script" goose up
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_shard" goose up
 	@echo "migrate complected"
 
 down:
 	@echo "Starting down"
 
 	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_STRING) GOOSE_MIGRATION_DIR="migrations" goose down
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_script" goose down
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_shard" goose down
 	@echo "migrate down complected"
 
 reshard:
 	@echo "Starting resharding"
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_shard" goose -no-versioning up
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_script" goose -no-versioning up
 	@echo "resharding complected"
 
 status:
