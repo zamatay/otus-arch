@@ -7,7 +7,6 @@ import (
 
 	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
@@ -20,16 +19,14 @@ type PostServiced interface {
 }
 
 type Post struct {
-	service  PostServiced
-	cache    *redis.Cache //FeedPosted
-	producer *kafka.Producer
+	service PostServiced
+	cache   *redis.Cache //FeedPosted
 }
 
-func NewPost(service PostServiced, cache *redis.Cache, s *srvApi.Service, producer *kafka.Producer) *Post {
+func NewPost(service PostServiced, cache *redis.Cache, s *srvApi.Service) *Post {
 	api := new(Post)
 	api.service = service
 	api.cache = cache
-	api.producer = producer
 	api.RegisterHandler(s)
 	return api
 }

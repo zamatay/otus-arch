@@ -14,10 +14,10 @@ const Auth = ({ onLogin }) => {
                 password,
             });
             const token = response.data.token;
-            console.log(token);
-            console.log(response.data);
+            const userId = response.data.user_id;
             localStorage.setItem('token', token);
-            onLogin(token); // передаем токен в родительский компонент
+            localStorage.setItem('user_id', userId);
+            onLogin(token, userId);
         } catch (err) {
             setError('Invalid credentials');
         }

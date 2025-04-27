@@ -11,7 +11,7 @@ import (
 )
 
 type DialogServiced interface {
-	SendDialog(ctx context.Context, fromUserId int, toUserId int, text string) (bool, error)
+	SendDialog(ctx context.Context, fromUserId int, toUserId int, text string) (*domain.Dialog, error)
 	ListDialog(ctx context.Context, fromUserId int, toUserId int) ([]*domain.Dialog, error)
 }
 

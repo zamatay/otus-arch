@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 const postFields = "id, user_id, text"
@@ -19,7 +21,16 @@ func (r *Repo) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post,
 		`insert into posts(user_id, text) 
 			values ($1, $2)
 			RETURNING `+postFields+`;`, post.UserID, post.Text)
-	return r.scanRow(row)
+
+	postObject, err := r.scanRow(row)
+
+	if message, err := kafka.CreateMessage[domain.Post](strconv.Itoa(postObject.ID), "posts/create", *postObject, "posts"); err == nil {
+		if err := r.Producer.Produce(message); err != nil {
+			slog.Error("Ошибка при отправке kafka", "error", err)
+		}
+	}
+
+	return postObject, err
 }
 
 func (r *Repo) DeletePost(ctx context.Context, id int, userId int) (bool, error) {
@@ -28,6 +39,13 @@ func (r *Repo) DeletePost(ctx context.Context, id int, userId int) (bool, error)
 		slog.Error("Ошибка DeletePost", "error", err)
 		return false, internalError
 	}
+
+	if message, err := kafka.CreateMessage[domain.Post]("", "delete", domain.Post{ID: id, UserID: userId}, "posts"); err == nil {
+		if err := r.Producer.Produce(message); err != nil {
+			slog.Error("Ошибка при отправке kafka", "error", err)
+		}
+	}
+
 	return cmd.RowsAffected() > 0, nil
 }
 
