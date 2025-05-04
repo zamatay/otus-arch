@@ -13,8 +13,8 @@ import (
 type PostServiced interface {
 	CreatePost(context.Context, *domain.Post) (*domain.Post, error)
 	UpdatePost(context.Context, *domain.Post) (bool, error)
-	DeletePost(context.Context, int, int) (bool, error)
-	GetPost(context.Context, int) (*domain.Post, error)
+	DeletePost(context.Context, string, int) (bool, error)
+	GetPost(context.Context, string) (*domain.Post, error)
 	FeedPost(context.Context, int, int, int) ([]*domain.Post, error)
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"strconv"
 
 	"github.com/jackc/pgx/v5"
 
@@ -24,7 +23,7 @@ func (r *Repo) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post,
 
 	postObject, err := r.scanRow(row)
 
-	if message, err := kafka.CreateMessage[domain.Post](strconv.Itoa(postObject.ID), "posts/create", *postObject, "posts"); err == nil {
+	if message, err := kafka.CreateMessage[domain.Post](postObject.ID, "posts/create", *postObject, "posts"); err == nil {
 		if err := r.Producer.Produce(message); err != nil {
 			slog.Error("Ошибка при отправке kafka", "error", err)
 		}
@@ -33,7 +32,7 @@ func (r *Repo) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post,
 	return postObject, err
 }
 
-func (r *Repo) DeletePost(ctx context.Context, id int, userId int) (bool, error) {
+func (r *Repo) DeletePost(ctx context.Context, id string, userId int) (bool, error) {
 	cmd, err := r.GetWriteConnection().Exec(ctx, `delete from posts where id=$1 and user_id=$2`, id, userId)
 	if err != nil {
 		slog.Error("Ошибка DeletePost", "error", err)
@@ -50,8 +49,7 @@ func (r *Repo) DeletePost(ctx context.Context, id int, userId int) (bool, error)
 }
 
 func (r *Repo) UpdatePost(ctx context.Context, post *domain.Post) (bool, error) {
-	userFrom := domain.GetUserFromContext(ctx)
-	cmd, err := r.GetWriteConnection().Exec(ctx, `update posts set text = $2 where id=$1 and user_id=$3`, post.ID, post.Text, userFrom.Id)
+	cmd, err := r.GetWriteConnection().Exec(ctx, `update posts set text = $2 where id=$1 and user_id=$3`, post.ID, post.Text)
 	if err != nil {
 		slog.Error("Ошибка UpdatePost", "error", err)
 		return false, internalError
@@ -69,7 +67,7 @@ func (r *Repo) scanRow(row pgx.Row) (*domain.Post, error) {
 	return &post, nil
 }
 
-func (r *Repo) GetPost(ctx context.Context, id int) (*domain.Post, error) {
+func (r *Repo) GetPost(ctx context.Context, id string) (*domain.Post, error) {
 	row := r.GetConnection().QueryRow(ctx, `select `+postFields+` from posts where id=$1`, id)
 	return r.scanRow(row)
 }

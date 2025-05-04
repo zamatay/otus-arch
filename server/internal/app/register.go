@@ -20,7 +20,7 @@ func RegisterApi(ctx context.Context, repo *repository.Repo, service *api.Servic
 	user.NewUser(repo, service)
 	auth.NewAuth(repo, service, secret)
 	friend.NewFriend(repo, service)
-	post.NewPost(repo, cache, service)
+	post.NewPost(cache, cache, service)
 	dialogs.NewDialog(repo, cache, service)
 	_, err := ws.NewWS(ctx, repo, service, config)
 	if err != nil {
