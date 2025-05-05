@@ -37,7 +37,7 @@ func (p *Producer) Produce(msg *sarama.ProducerMessage) error {
 	return nil
 }
 
-func CreateMessage[T any](key string, messageType string, value T) (*sarama.ProducerMessage, error) {
+func CreateMessage[T any](key string, messageType string, value T, topic string) (*sarama.ProducerMessage, error) {
 	jsonData, err := json.Marshal(value)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func CreateMessage[T any](key string, messageType string, value T) (*sarama.Prod
 				Value: []byte(messageType),
 			},
 		},
-		Topic: "posts",
+		Topic: topic,
 		Value: sarama.ByteEncoder(jsonData),
 		Key:   sarama.StringEncoder("key"),
 	}, nil

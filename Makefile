@@ -15,7 +15,7 @@ up:
 down:
 	@echo "Starting down"
 
-	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_STRING) GOOSE_MIGRATION_DIR="migrations" goose down
+	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_STRING) GOOSE_MIGRATION_DIRmigrations" goose down
 	GOOSE_DRIVER=postgres GOOSE_DBSTRING=$(DB_SHARD_STRING) GOOSE_MIGRATION_DIR="migrations_shard" goose down
 	@echo "migrate down complected"
 

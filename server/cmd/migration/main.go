@@ -14,7 +14,7 @@ import (
 	"github.com/brianvoe/gofakeit/v7"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
 )
 
 var (
@@ -43,7 +43,7 @@ func getConnectionString() string {
 
 	var dbstring string
 	if len(args) == 0 {
-		config, err := app.NewConfig()
+		config, err := config.NewConfig()
 		if err != nil {
 			return ""
 		}

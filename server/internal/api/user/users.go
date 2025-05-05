@@ -2,9 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"net/http"
 
 	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
@@ -37,12 +34,4 @@ func (u *User) RegisterHandler(r srvApi.AddRouted) {
 	r.AddProtectedRoute("/user/get", u.GetUser)
 	r.AddProtectedRoute("/user/remove", u.Remove)
 	r.AddProtectedRoute("/user/search", u.SearchUser)
-}
-
-func run(host string, port uint16) {
-	addr := fmt.Sprintf("%s:%d", host, port)
-	err := http.ListenAndServe(addr, nil)
-	if err != nil {
-		log.Fatal("Ошибка при попытки запустить http сервер", err)
-	}
 }

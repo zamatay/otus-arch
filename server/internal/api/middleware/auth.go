@@ -2,19 +2,16 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
-
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
 )
 
 type HandleFunc func(http.ResponseWriter, *http.Request)
 
 // Middleware для проверки токена
-func TokenMiddleware(next HandleFunc, secretKey []byte) HandleFunc {
+func TokenMiddleware(next HandleFunc) HandleFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
@@ -30,23 +27,12 @@ func TokenMiddleware(next HandleFunc, secretKey []byte) HandleFunc {
 
 		}
 
-		token, err := jwt.ParseWithClaims(a[1], &domain.UserClaims{}, func(token *jwt.Token) (any, error) {
-			// Проверка метода подписи
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
-			return secretKey, nil
-		})
+		user, err := utils.UserByToken(a[1])
 
-		if err != nil || !token.Valid {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
-		}
 
-		user, ok := token.Claims.(*domain.UserClaims)
-		if !ok {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
-			return
 		}
 
 		ctx := context.WithValue(r.Context(), "auth", user)

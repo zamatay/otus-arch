@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api/middleware"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
 )
 
 type AddRouted interface {
@@ -31,7 +32,6 @@ type Service struct {
 	protectedRouter *http.ServeMux
 	ErrorCh         chan error
 	uptime          time.Time
-	secret          []byte
 }
 
 func New(config *Config, secret string) (*Service, error) {
@@ -48,7 +48,8 @@ func New(config *Config, secret string) (*Service, error) {
 	srv.ReadTimeout = config.ReadTimeout
 	srv.WriteTimeout = config.WriteTimeout
 	srv.IdleTimeout = config.IdleTimeout
-	srv.secret = []byte(secret)
+
+	utils.UserByToken = utils.SetUserByToken([]byte(secret))
 
 	srv.router.HandleFunc("/health", srv.healthCheckHandler)
 
@@ -62,7 +63,7 @@ func (srv *Service) AddRoute(path string, handler func(http.ResponseWriter, *htt
 }
 
 func (srv *Service) AddProtectedRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware(handler, srv.secret)))
+	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware(handler)))
 }
 
 func (srv *Service) AddHandle(path string, handler http.Handler) {
@@ -89,4 +90,8 @@ func (srv *Service) Stop(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func (srv *Service) GetRoute() *http.ServeMux {
+	return srv.router
 }

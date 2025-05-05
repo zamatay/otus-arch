@@ -11,24 +11,25 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
 )
 
 func main() {
 	ctx, done := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer done()
 
-	config, err := app.NewConfig()
+	config, err := config.NewConfig()
 	if err != nil {
 		log.Fatal("Ошибка при инициализации конфига приложения", err)
 	}
 	slog.Info("Загрузили конфиг", "config", config)
 
-	repo, cache, producer, service, err := app.NewInfra(ctx, config)
+	repo, cache, service, err := app.NewInfra(ctx, config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации приложения", err)
 	}
 
-	app.RegisterApi(repo, service, cache, producer, config.App.Secret)
+	app.RegisterApi(ctx, repo, service, cache, config.App.Secret, config)
 
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)

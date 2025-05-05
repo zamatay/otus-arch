@@ -12,7 +12,7 @@ import (
 var signingKey []byte
 
 type AuthServiced interface {
-	Login(context.Context, string, string) (string, error)
+	Login(context.Context, string, string) (string, *domain.User, error)
 	Register(context.Context, domain.RegisterUser) error
 }
 
@@ -30,13 +30,13 @@ func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := a.service.Login(ctx, au.User, au.Password)
+	token, user, err := a.service.Login(ctx, au.User, au.Password)
 	if err != nil {
 		srvApi.SetError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	result := domain.AuthUserResult{Token: token}
+	result := domain.AuthUserResult{Token: token, UserID: user.ID}
 	srvApi.SetOk(w, result)
 }
 

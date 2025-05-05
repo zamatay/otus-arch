@@ -5,12 +5,15 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 type Repo struct {
 	balancer  *RandomBalancer
 	writeConn *pgxpool.Pool
 	shardConn *pgxpool.Pool
+	Producer  *kafka.Producer
 }
 
 func (r *Repo) Close(ctx context.Context) error {

@@ -22,11 +22,10 @@ func (u *Dialog) Send(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	IsOk, err := u.service.SendDialog(ctx, userFrom.Id, d.ToUserID, d.Text)
-	if err != nil {
+	if _, err = u.service.SendDialog(ctx, userFrom.Id, d.ToUserID, d.Text); err != nil {
 		return
 	}
 
-	srvApi.SetOk(writer, srvApi.OkFalse(IsOk))
+	srvApi.SetOk(writer, srvApi.OkFalse(true))
 
 }
