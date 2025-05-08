@@ -136,6 +136,17 @@ services:
       timeout: 5s
       retries: 3
 
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - "8001:8001"
+    networks:
+      - redis-net
+    depends_on:
+      - redis
+    volumes:
+      - redis_insight_data:/db
   app:
     build:
       context: ./../server
@@ -241,6 +252,9 @@ volumes:
   pg_2_data:
   pg_3_data:
   healthcheck-volume:
+  redis_insight_data:
 networks:
   postgres-ha:
+    driver: bridge
+  redis-net:
     driver: bridge

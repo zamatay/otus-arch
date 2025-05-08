@@ -49,7 +49,7 @@ func (w WS) handleWebSocket(writer http.ResponseWriter, request *http.Request) {
 		messageType, message, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("Ошибка чтения:", err)
-			continue
+			break
 		}
 
 		if err := w.Handle(conn, messageType, message); err != nil {
@@ -96,7 +96,7 @@ func (w WS) processConsumer() {
 
 			if string(header.Value) == "posts/create" {
 				tmp := struct {
-					Id        int       `json:"id"`
+					Id        string    `json:"id"`
 					UserId    int       `json:"user_id"`
 					Text      string    `json:"text"`
 					CreatedAt time.Time `json:"created_at"`

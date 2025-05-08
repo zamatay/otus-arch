@@ -3,6 +3,8 @@ package post
 import (
 	"net/http"
 
+	"github.com/hashicorp/go-uuid"
+
 	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
@@ -18,15 +20,14 @@ func (u *Post) Create(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	if post.ID == "" {
+		post.ID, _ = uuid.GenerateUUID()
+	}
 	postObject, err := u.service.CreatePost(ctx, post)
 	if err != nil {
 		srvApi.SetError(writer, err.Error(), 500)
 		return
 	}
-
-	/*	//Что бы не задерживать пользователю ответ, кэширование будем проводить конкурентно
-		go func(post domain.Post) {
-		}(*postObject)*/
 
 	srvApi.SetOk(writer, postObject)
 }
