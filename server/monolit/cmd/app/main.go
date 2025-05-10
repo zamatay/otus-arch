@@ -24,7 +24,7 @@ func main() {
 	}
 	slog.Info("Загрузили конфиг", "config", config)
 
-	repo, cache, service, err := app.NewInfra(ctx, config)
+	repo, cache, service, _, err := app.NewInfra(ctx, config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации приложения", err)
 	}

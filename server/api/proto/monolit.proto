@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package balances;
+import "google/protobuf/empty.proto";
+option go_package = "/monolit";
+
+service OtusMonolit {
+  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty) {};
+}

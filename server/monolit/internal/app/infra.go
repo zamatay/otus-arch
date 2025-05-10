@@ -5,32 +5,35 @@ import (
 
 	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
+	"githib.com/zamatay/otus/arch/lesson-1/internal/grpcapi"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
 	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
-func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, error) {
+func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, *grpconnection.Service, error) {
 	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"], config.DB["shard"])
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	cache, err := redis.NewCache(ctx, config.Cache)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	repo.Producer, err = kafka.NewProducer(config.Kafka)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	service, err := api.New(&config.Http, config.App.Secret)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
-	return repo, cache, service, err
+	grpc, err := grpconnection.NewGrpcService()
+
+	return repo, cache, service, grpc, err
 
 }
