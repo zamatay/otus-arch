@@ -1,0 +1,16 @@
+app:
+  name: otus-arch-dialogs
+  secret: my-secret
+db:
+  host: localhost
+  port: 7432
+  user: postgres
+  password: postgres
+  database: facebook
+http:
+  host: localhost
+  port: 8081
+GRPC:
+  port: 3100
+  host: localhost
+  UseTls: false

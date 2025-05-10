@@ -161,7 +161,7 @@ services:
       - redis
       - kafka
     volumes:
-      - ../server/config.yaml.deploy:/api/config.yaml
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
   migration:
     build:
       context: ./../server
@@ -170,7 +170,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ../server/config.yaml.deploy:/api/config.yaml
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
   consumer:
     build:
       context: ./../server
@@ -179,7 +179,7 @@ services:
     depends_on:
       - db
     volumes:
-      - ../server/config.yaml.deploy:/api/config.yaml
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
