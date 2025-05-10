@@ -161,7 +161,7 @@ services:
       - redis
       - kafka
     volumes:
-      - ../server/config.yaml.deploy:/api/config.yaml
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
   migration:
     build:
       context: ./../server
