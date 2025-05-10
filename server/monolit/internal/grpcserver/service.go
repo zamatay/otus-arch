@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"githib.com/zamatay/otus/arch/lesson-1"
+	"githib.com/zamatay/otus/arch/api/monolit"
 )
 
 type Service struct {

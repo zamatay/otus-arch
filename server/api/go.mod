@@ -1,4 +1,4 @@
-module githib.com/zamatay/otus/arch/api
+module github.com/zamatay/otus/arch/api
 
 go 1.24.2
 
