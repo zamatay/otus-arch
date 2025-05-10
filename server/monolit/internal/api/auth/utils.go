@@ -7,7 +7,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 const _expired = time.Hour * 1

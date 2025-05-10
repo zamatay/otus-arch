@@ -4,19 +4,20 @@ import (
 	"context"
 	"log"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/auth"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/dialogs"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/friend"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/post"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/ws"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/auth"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/dialogs"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/friend"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/post"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/user"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/ws"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/grpcserver"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
-func RegisterApi(ctx context.Context, repo *repository.Repo, service *api.Service, cache *redis.Cache, secret string, config *config.Config) {
+func RegisterApi(ctx context.Context, repo *repository.Repo, service *api.Service, grpcService *grpcserver.Service, cache *redis.Cache, secret string, config *config.Config) {
 	user.NewUser(repo, service)
 	auth.NewAuth(repo, service, secret)
 	friend.NewFriend(repo, service)
@@ -26,4 +27,15 @@ func RegisterApi(ctx context.Context, repo *repository.Repo, service *api.Servic
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = grpcService.Register(ctx, service)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go func() {
+		if err := grpcService.Start(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 }

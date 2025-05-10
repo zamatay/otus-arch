@@ -11,14 +11,14 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/gorilla/websocket"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	dialogs2 "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/dialogs"
-	domainmes "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/posts"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	dialogs2 "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/dialogs"
+	domainmes "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/ws/posts"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository"
 )
 
 type service interface {

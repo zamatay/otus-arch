@@ -3,15 +3,15 @@ package app
 import (
 	"context"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/grpcapi"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/grpcserver"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
-func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, *grpconnection.Service, error) {
+func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, *grpcserver.Service, error) {
 	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"], config.DB["shard"])
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -32,7 +32,7 @@ func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *re
 		return nil, nil, nil, nil, err
 	}
 
-	grpc, err := grpconnection.NewGrpcService()
+	grpc, err := grpcserver.NewGRPCServer(&config.GRPC)
 
 	return repo, cache, service, grpc, err
 

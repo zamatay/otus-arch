@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 func (r *Repo) SendDialog(ctx context.Context, fromUserId int, toUserId int, text string) (*domain.Dialog, error) {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 type Repo struct {

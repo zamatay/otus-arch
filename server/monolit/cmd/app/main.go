@@ -10,8 +10,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/app"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/app"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
 )
 
 func main() {
@@ -24,12 +24,12 @@ func main() {
 	}
 	slog.Info("Загрузили конфиг", "config", config)
 
-	repo, cache, service, _, err := app.NewInfra(ctx, config)
+	repo, cache, service, grpcServer, err := app.NewInfra(ctx, config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации приложения", err)
 	}
 
-	app.RegisterApi(ctx, repo, service, cache, config.App.Secret, config)
+	app.RegisterApi(ctx, repo, service, grpcServer, cache, config.App.Secret, config)
 
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)

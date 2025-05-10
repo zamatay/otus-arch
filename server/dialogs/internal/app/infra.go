@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"dialogs/internal/api"
+	"dialogs/internal/api/grpcclient"
 	"dialogs/internal/config"
 	"dialogs/internal/repository"
 )
@@ -18,6 +19,10 @@ func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *ap
 	if err != nil {
 		return nil, nil, err
 	}
+
+	client := grpcclient.NewMonolitService(config.GRPC)
+	checker := api.NewHealthCheckHandler(client)
+	service.AddHandle("/health", checker)
 
 	return repo, service, err
 

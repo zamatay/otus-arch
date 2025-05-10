@@ -7,8 +7,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 const postFields = "id, user_id, text"

@@ -3,8 +3,8 @@ package dialogs
 import (
 	"net/http"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 func (u *Dialog) List(writer http.ResponseWriter, request *http.Request) {

@@ -43,8 +43,6 @@ func New(config *Config, secret string) (*Service, error) {
 
 	http2.UserByToken = http2.SetUserByToken([]byte(secret))
 
-	srv.router.HandleFunc("/health", srv.healthCheckHandler)
-
 	srv.uptime = time.Now()
 	srv.ErrorCh = make(chan error)
 	return srv, nil

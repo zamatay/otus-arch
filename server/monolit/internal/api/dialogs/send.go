@@ -3,8 +3,8 @@ package dialogs
 import (
 	"net/http"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 func (u *Dialog) Send(writer http.ResponseWriter, request *http.Request) {

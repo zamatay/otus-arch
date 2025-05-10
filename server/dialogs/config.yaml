@@ -10,3 +10,7 @@ db:
 http:
   host: localhost
   port: 8081
+GRPC:
+  port: 3100
+  host: localhost
+  UseTls: false

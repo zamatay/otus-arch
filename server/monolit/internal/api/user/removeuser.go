@@ -3,7 +3,7 @@ package user
 import (
 	"net/http"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
 func (api *User) Remove(writer http.ResponseWriter, request *http.Request) {

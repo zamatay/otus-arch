@@ -3,9 +3,9 @@ package friend
 import (
 	"net/http"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	userSrv "githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api"
+	userSrv "github.com/zamatay/otus/arch/lesson-1/internal/api/user"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 func (u *Friend) Delete(w http.ResponseWriter, r *http.Request) {

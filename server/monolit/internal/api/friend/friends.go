@@ -3,7 +3,7 @@ package friend
 import (
 	"context"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
 type FriendServiced interface {

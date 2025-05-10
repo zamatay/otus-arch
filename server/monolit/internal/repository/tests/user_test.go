@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jackc/pgx/v5"

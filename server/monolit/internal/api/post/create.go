@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/go-uuid"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
 const cacheCount = 1000

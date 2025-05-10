@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 type PostServiced interface {

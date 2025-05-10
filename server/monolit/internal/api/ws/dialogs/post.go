@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	domain2 "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	domain2 "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type DialogMessage struct {

@@ -3,11 +3,11 @@ package config
 import (
 	"github.com/spf13/viper"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/grpconnection"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/grpcserver"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 type Config struct {

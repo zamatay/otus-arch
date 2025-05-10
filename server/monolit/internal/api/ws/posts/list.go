@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
-	domainmes "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
+	domainmes "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type ListMessage struct {

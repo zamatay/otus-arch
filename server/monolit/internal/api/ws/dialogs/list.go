@@ -6,9 +6,9 @@ import (
 	"log/slog"
 	"strconv"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
-	domain2 "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
+	domain2 "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type DialogsMessage struct {

@@ -14,7 +14,7 @@ import (
 	"github.com/brianvoe/gofakeit/v7"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
 )
 
 var (

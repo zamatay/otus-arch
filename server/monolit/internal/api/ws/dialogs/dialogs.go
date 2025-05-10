@@ -1,7 +1,7 @@
 package dialogs
 
 import (
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/dialogs"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/dialogs"
 )
 
 type Dialogs struct {

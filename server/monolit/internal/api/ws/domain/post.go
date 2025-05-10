@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type PostMessage struct {

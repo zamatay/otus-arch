@@ -9,10 +9,10 @@ import (
 
 	"github.com/IBM/sarama"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/config"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/kafka"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
+	"github.com/zamatay/otus/arch/lesson-1/internal/config"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
+	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
 const (

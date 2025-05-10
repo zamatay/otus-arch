@@ -1,7 +1,7 @@
 package posts
 
 import (
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/post"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/post"
 )
 
 type Posts struct {

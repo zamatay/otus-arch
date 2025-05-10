@@ -8,8 +8,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/auth"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/auth"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 func (r *Repo) Login(ctx context.Context, name string, password string) (string, *domain.User, error) {

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"log/slog"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
 )
 
 const AuthAction = "auth"

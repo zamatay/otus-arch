@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type FeedPosted interface {

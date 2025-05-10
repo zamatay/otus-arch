@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 
 	"dialogs/internal/api"
+	"dialogs/internal/api/grpcclient"
 	"dialogs/internal/repository"
 )
 
@@ -17,6 +18,7 @@ type Config struct {
 	DB  *repository.Config
 	//Cache redis.Config
 	Http api.Config
+	GRPC grpcclient.Config
 	//Kafka kafka.Config
 }
 

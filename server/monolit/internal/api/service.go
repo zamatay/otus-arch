@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/middleware"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/utils"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/middleware"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
 )
 
 type AddRouted interface {

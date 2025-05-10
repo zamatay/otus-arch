@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	srvApi "githib.com/zamatay/otus/arch/lesson-1/internal/api"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type UserServiced interface {

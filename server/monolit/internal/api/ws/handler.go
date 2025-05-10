@@ -7,9 +7,9 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/dialogs"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/posts"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/ws/dialogs"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/ws/posts"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 type getterUser interface {

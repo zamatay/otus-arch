@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	domainmes "githib.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	domainmes "github.com/zamatay/otus/arch/lesson-1/internal/api/ws/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 const PostsPostAction = "posts/create"

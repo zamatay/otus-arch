@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 )
 
 var IsEmpty = errors.New("user is empty")

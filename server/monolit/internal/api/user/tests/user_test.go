@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"githib.com/zamatay/otus/arch/lesson-1/internal/api/user"
-	"githib.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/api/user"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
