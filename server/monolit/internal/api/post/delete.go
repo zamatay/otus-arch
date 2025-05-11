@@ -1,0 +1,24 @@
+package post
+
+import (
+	"net/http"
+
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
+	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+)
+
+func (u *Post) Delete(writer http.ResponseWriter, request *http.Request) {
+	ctx, done := srvApi.GetContext(request.Context())
+	defer done()
+
+	id := request.URL.Query().Get("id")
+
+	userFrom := domain.GetUserFromContext(ctx)
+	isOk, err := u.service.DeletePost(ctx, id, userFrom.Id)
+	if err != nil {
+		srvApi.SetError(writer, err.Error(), 500)
+		return
+	}
+
+	srvApi.SetOk(writer, srvApi.OkFalse(isOk))
+}
