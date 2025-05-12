@@ -7,7 +7,7 @@ import (
 )
 
 func (api *User) AddUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(r.Context())
 	defer done()
 
 	user, err := GetUser(r)

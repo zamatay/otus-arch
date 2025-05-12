@@ -41,7 +41,7 @@ func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(r.Context())
 	defer done()
 
 	var u domain.RegisterUser

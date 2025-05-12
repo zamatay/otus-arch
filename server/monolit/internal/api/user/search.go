@@ -1,12 +1,13 @@
 package user
 
 import (
-	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 	"net/http"
+
+	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 )
 
 func (api *User) SearchUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(r.Context())
 	defer done()
 
 	firstName, err := GetByName(r, "first_name")

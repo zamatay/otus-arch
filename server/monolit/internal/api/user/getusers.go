@@ -7,14 +7,14 @@ import (
 )
 
 func (api *User) GetUsers(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(r.Context())
 	defer done()
 
 	srvApi.SetOk(w, api.service.GetUsers(ctx))
 }
 
 func (api *User) GetUser(w http.ResponseWriter, r *http.Request) {
-	ctx, done := srvApi.GetContext(nil)
+	ctx, done := srvApi.GetContext(r.Context())
 	defer done()
 
 	var id int

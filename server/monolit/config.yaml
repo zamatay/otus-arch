@@ -4,12 +4,7 @@ app:
 db:
   read:
     - host: localhost
-      port: 6433
-      user: postgres
-      password: postgres
-      database: facebook
-    - host: localhost
-      port: 6434
+      port: 5433
       user: postgres
       password: postgres
       database: facebook

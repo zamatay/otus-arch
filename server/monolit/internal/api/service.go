@@ -28,10 +28,10 @@ type Config struct {
 
 type Service struct {
 	http.Server
-	router          *http.ServeMux
-	protectedRouter *http.ServeMux
-	ErrorCh         chan error
-	uptime          time.Time
+	router *http.ServeMux
+	//protectedRouter *http.ServeMux
+	ErrorCh chan error
+	uptime  time.Time
 }
 
 func New(config *Config, secret string) (*Service, error) {
@@ -41,7 +41,7 @@ func New(config *Config, secret string) (*Service, error) {
 
 	srv := new(Service)
 	srv.router = http.NewServeMux()
-	srv.protectedRouter = http.NewServeMux()
+	//srv.protectedRouter = http.NewServeMux()
 
 	srv.Addr = fmt.Sprintf("%s:%d", config.Host, config.Port)
 	srv.Handler = srv.router
@@ -63,7 +63,7 @@ func (srv *Service) AddRoute(path string, handler func(http.ResponseWriter, *htt
 }
 
 func (srv *Service) AddProtectedRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware(handler)))
+	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware((handler))))
 }
 
 func (srv *Service) AddHandle(path string, handler http.Handler) {

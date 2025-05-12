@@ -6,6 +6,7 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 COPY ./ ./
+
 RUN go build -o api ./cmd/app/main.go
 
 FROM --platform=linux/amd64 debian:bookworm

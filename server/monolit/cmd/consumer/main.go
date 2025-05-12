@@ -70,7 +70,7 @@ func main() {
 
 	}()
 
-	newConsumer.Process()
+	newConsumer.Process(context.Background())
 }
 
 func (r *Cache) deleteFromCache(msg *sarama.ConsumerMessage) {
