@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./../server/monolit
+      dockerfile: ./../../deploy/app/Dockerfile
+    depends_on:
+      - pg-1
+      - master
+      - pg-2
+      - pg-3
+      - redis
+      - kafka
+      - worker
+      - manager
+    volumes:
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
+    networks:
+      - app_network
+  consumer:
+    build:
+      context: ./../server/monolit
+      dockerfile: ./../../deploy/consumer/Dockerfile
+    container_name: consumer_deploy
+    depends_on:
+      - pg-1
+      - worker
+    volumes:
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
+  nginx:
+    image: nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+    networks:
+      - app_network
+networks:
+  app_network:
+#  dialog:
+#    build:
+#      context: ./../server/monolit
+#      dockerfile: ./../../deploy/consumer/Dockerfile
+#    container_name: consumer_deploy
+#    depends_on:
+#      - db
+#      - worker
+#    volumes:
+#      - ../server/monolit/config.yaml.deploy:/api/config.yaml

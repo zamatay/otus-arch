@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  migration:
+    build:
+      context: ./../server/monolit
+      dockerfile: ./../../deploy/migrate/Dockerfile
+    container_name: migration_deploy
+    volumes:
+      - ../server/monolit/config.yaml.deploy:/api/config.yaml
+    networks:
+      - deploy_app_network
+networks:
+  deploy_app_network:
+    external: true

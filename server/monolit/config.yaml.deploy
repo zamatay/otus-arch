@@ -3,30 +3,33 @@ app:
   secret: my-secret
 db:
   read:
-    - host: pg-2
-      port: 6433
-      user: postgres
-      password: postgres
-      database: facebook
-    - host: pg-3
-      port: 6434
+    - host: haproxy
+      port: 5433
       user: postgres
       password: postgres
       database: facebook
   write:
-    - host: db
-      port: 6432
+    - host: pg-1
+      port: 5432
+      user: postgres
+      password: postgres
+      database: facebook
+  shard:
+    - host: master
+      port: 5432
       user: postgres
       password: postgres
       database: facebook
 http:
   host: 0.0.0.0
-  port: 80
+  port: 3000
 cache:
   host: redis
-  port: 6389
+  port: 6379
   password: redis
   user: default
 kafka:
   host: kafka
-  port: 29092
+  port: 9092
+GRPC:
+  port: 3100
