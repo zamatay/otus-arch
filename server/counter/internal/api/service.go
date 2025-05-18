@@ -4,15 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
 
-	"github.com/zamatay/otus/arch/lesson-1/internal/api/grpcclient/counter"
-	"github.com/zamatay/otus/arch/lesson-1/internal/api/middleware"
-	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
-	"github.com/zamatay/otus/arch/lesson-1/internal/grpcserver"
+	httpInternal "counter/pkg/http"
+	middlewareInternal "counter/pkg/http/middleware"
 )
 
 type AddRouted interface {
@@ -21,22 +18,12 @@ type AddRouted interface {
 	AddHandle(string, http.Handler)
 }
 
-type Config struct {
-	Host         string
-	Port         uint16
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
-}
-
 type Service struct {
 	http.Server
-	router *http.ServeMux
-	//protectedRouter *http.ServeMux
-	ErrorCh    chan error
-	uptime     time.Time
-	Grpc       *grpcserver.Service
-	CounterSrv *counter.CounterService
+	router          *http.ServeMux
+	protectedRouter *http.ServeMux
+	ErrorCh         chan error
+	uptime          time.Time
 }
 
 func New(config *Config, secret string) (*Service, error) {
@@ -46,7 +33,7 @@ func New(config *Config, secret string) (*Service, error) {
 
 	srv := new(Service)
 	srv.router = http.NewServeMux()
-	//srv.protectedRouter = http.NewServeMux()
+	srv.protectedRouter = http.NewServeMux()
 
 	srv.Addr = fmt.Sprintf("%s:%d", config.Host, config.Port)
 	srv.Handler = srv.router
@@ -54,9 +41,7 @@ func New(config *Config, secret string) (*Service, error) {
 	srv.WriteTimeout = config.WriteTimeout
 	srv.IdleTimeout = config.IdleTimeout
 
-	utils.UserByToken = utils.SetUserByToken([]byte(secret))
-
-	srv.router.HandleFunc("/health", srv.healthCheckHandler)
+	httpInternal.UserByToken = httpInternal.SetUserByToken([]byte(secret))
 
 	srv.uptime = time.Now()
 	srv.ErrorCh = make(chan error)
@@ -64,11 +49,11 @@ func New(config *Config, secret string) (*Service, error) {
 }
 
 func (srv *Service) AddRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.CorsMiddleware(handler))
+	srv.router.HandleFunc(path, middlewareInternal.CorsMiddleware(handler))
 }
 
 func (srv *Service) AddProtectedRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware((handler))))
+	srv.router.HandleFunc(path, middlewareInternal.CorsMiddleware(middlewareInternal.TokenMiddleware(handler)))
 }
 
 func (srv *Service) AddHandle(path string, handler http.Handler) {
@@ -86,13 +71,6 @@ func (srv *Service) Start() error {
 			srv.ErrorCh <- err
 		}
 	}()
-
-	go func() {
-		if err := srv.Grpc.Start(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-
 	return nil
 }
 

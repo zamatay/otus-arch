@@ -92,3 +92,20 @@ func (r *Repo) FeedPost(ctx context.Context, offset int, limit int, userId int) 
 
 	return posts, nil
 }
+
+func (r *Repo) Read(ctx context.Context, postId int, userId int) (int64, error) {
+	_, err := r.GetWriteConnection().Exec(ctx, `insert into user_reade(user_id, post_id) values ($1, $2)
+ 		on conflict(user_id,post_id)
+ 		do update set update_ad = now()`, userId, postId)
+	if err != nil {
+		slog.Error("Ошибка Read", "error", err)
+		return 0, internalError
+	}
+	row := r.GetConnection().QueryRow(ctx, `select count(*) from user_reade where post_id=$1`, postId)
+	count := int64(0)
+	if err = row.Scan(&count); err != nil {
+		slog.Error("Ошибка Scan", "error", err)
+		return 0, internalError
+	}
+	return count, nil
+}

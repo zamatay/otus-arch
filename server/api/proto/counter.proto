@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package otus;
+option go_package = "/counter";
+
+service counter {
+  rpc Increase (CounterRequest) returns (CounterResponse);
+  rpc Decrease (CounterRequest) returns (CounterResponse);
+}
+
+message CounterResponse {
+  bool status = 1;
+}
+
+message CounterRequest {
+  int32 PostId = 1;
+}

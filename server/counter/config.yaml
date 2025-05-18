@@ -1,0 +1,17 @@
+app:
+  name: otus-arch-dialogs
+  secret: my-secret
+http:
+  host: localhost
+  port: 8082
+GRPCClient:
+  port: 3100
+  host: localhost
+  UseTls: false
+GRPCServer:
+  port: 3200
+cache:
+  host: localhost
+  port: 6389
+  password: redis
+  user: default
