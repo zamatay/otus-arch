@@ -12,31 +12,31 @@ import (
 	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 )
 
-func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, error) {
+func NewInfra(ctx context.Context, config *config.Config) (*repository.Repo, *redis.Cache, *api.Service, *kafka.Producer, error) {
 	repo, err := repository.NewRepo(ctx, config.DB["read"], config.DB["write"], config.DB["shard"])
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	cache, err := redis.NewCache(ctx, config.Cache)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
-	repo.Producer, err = kafka.NewProducer(config.Kafka)
+	kafkaProducer, err := kafka.NewProducer(config.Kafka)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	service, err := api.New(&config.Http, config.App.Secret)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	service.Grpc, err = grpcserver.NewGRPCServer(&config.GRPC)
 
 	service.CounterSrv = counter.NewCounterService(config.GRPCCounter)
 
-	return repo, cache, service, err
+	return repo, cache, service, kafkaProducer, err
 
 }

@@ -24,12 +24,12 @@ func main() {
 	}
 	slog.Info("Загрузили конфиг", "config", config)
 
-	repo, cache, service, err := app.NewInfra(ctx, config)
+	repo, cache, service, kafkaProducer, err := app.NewInfra(ctx, config)
 	if err != nil {
 		log.Fatal("Ошибка при инициализации приложения", err)
 	}
 
-	app.RegisterApi(ctx, repo, service, cache, config.App.Secret, config)
+	app.RegisterApi(ctx, repo, service, cache, config.App.Secret, config, kafkaProducer)
 
 	if err := service.Start(); err != nil {
 		log.Fatal("Ошибка при запуске http", err)

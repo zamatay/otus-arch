@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 const postFields = "id, user_id, text"
@@ -23,12 +22,6 @@ func (r *Repo) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post,
 
 	postObject, err := r.scanRow(row)
 
-	if message, err := kafka.CreateMessage[domain.Post](postObject.ID, "posts/create", *postObject, "posts"); err == nil {
-		if err := r.Producer.Produce(message); err != nil {
-			slog.Error("Ошибка при отправке kafka", "error", err)
-		}
-	}
-
 	return postObject, err
 }
 
@@ -37,12 +30,6 @@ func (r *Repo) DeletePost(ctx context.Context, id string, userId int) (bool, err
 	if err != nil {
 		slog.Error("Ошибка DeletePost", "error", err)
 		return false, internalError
-	}
-
-	if message, err := kafka.CreateMessage[domain.Post]("", "delete", domain.Post{ID: id, UserID: userId}, "posts"); err == nil {
-		if err := r.Producer.Produce(message); err != nil {
-			slog.Error("Ошибка при отправке kafka", "error", err)
-		}
 	}
 
 	return cmd.RowsAffected() > 0, nil

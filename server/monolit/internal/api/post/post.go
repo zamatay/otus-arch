@@ -7,6 +7,7 @@ import (
 
 	srvApi "github.com/zamatay/otus/arch/lesson-1/internal/api"
 	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
+	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
 	"github.com/zamatay/otus/arch/lesson-1/internal/repository/redis"
 	"github.com/zamatay/otus/arch/lesson-1/pkg/api/counter"
 )
@@ -21,17 +22,19 @@ type PostServiced interface {
 }
 
 type Post struct {
-	service PostServiced
-	counter counter.CounterClient
-	cache   *redis.Cache //FeedPosted
+	service  PostServiced
+	counter  counter.CounterClient
+	cache    *redis.Cache //FeedPosted
+	Producer *kafka.Producer
 }
 
-func NewPost(service PostServiced, cache *redis.Cache, s *srvApi.Service, srv counter.CounterClient) *Post {
+func NewPost(service PostServiced, cache *redis.Cache, s *srvApi.Service, srv counter.CounterClient, producer *kafka.Producer) *Post {
 	api := new(Post)
 	api.service = service
 	api.cache = cache
 	api.RegisterHandler(s)
 	api.counter = srv
+	api.Producer = producer
 	return api
 }
 
