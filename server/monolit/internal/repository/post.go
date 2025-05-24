@@ -8,7 +8,6 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/zamatay/otus/arch/lesson-1/internal/domain"
-	"github.com/zamatay/otus/arch/lesson-1/internal/kafka"
 )
 
 const postFields = "id, user_id, text"
@@ -23,12 +22,6 @@ func (r *Repo) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post,
 
 	postObject, err := r.scanRow(row)
 
-	if message, err := kafka.CreateMessage[domain.Post](postObject.ID, "posts/create", *postObject, "posts"); err == nil {
-		if err := r.Producer.Produce(message); err != nil {
-			slog.Error("Ошибка при отправке kafka", "error", err)
-		}
-	}
-
 	return postObject, err
 }
 
@@ -37,12 +30,6 @@ func (r *Repo) DeletePost(ctx context.Context, id string, userId int) (bool, err
 	if err != nil {
 		slog.Error("Ошибка DeletePost", "error", err)
 		return false, internalError
-	}
-
-	if message, err := kafka.CreateMessage[domain.Post]("", "delete", domain.Post{ID: id, UserID: userId}, "posts"); err == nil {
-		if err := r.Producer.Produce(message); err != nil {
-			slog.Error("Ошибка при отправке kafka", "error", err)
-		}
 	}
 
 	return cmd.RowsAffected() > 0, nil
@@ -91,4 +78,21 @@ func (r *Repo) FeedPost(ctx context.Context, offset int, limit int, userId int) 
 	}
 
 	return posts, nil
+}
+
+func (r *Repo) Read(ctx context.Context, postId int, userId int) (int64, error) {
+	_, err := r.GetWriteConnection().Exec(ctx, `insert into user_reade(user_id, post_id) values ($1, $2)
+ 		on conflict(user_id,post_id)
+ 		do update set update_ad = now()`, userId, postId)
+	if err != nil {
+		slog.Error("Ошибка Read", "error", err)
+		return 0, internalError
+	}
+	row := r.GetConnection().QueryRow(ctx, `select count(*) from user_reade where post_id=$1`, postId)
+	count := int64(0)
+	if err = row.Scan(&count); err != nil {
+		slog.Error("Ошибка Scan", "error", err)
+		return 0, internalError
+	}
+	return count, nil
 }

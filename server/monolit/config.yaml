@@ -34,3 +34,7 @@ kafka:
   port: 29092
 GRPC:
   port: 3100
+GRPCCounter:
+  port: 3200
+  Host: localhost
+  UseTls: false

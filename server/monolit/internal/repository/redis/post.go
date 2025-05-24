@@ -12,6 +12,7 @@ import (
 )
 
 const keyTemplate = "posts:%d"
+const keyTemplatePostRead = "posts:read:%d"
 const keyTemplateIndex = "index"
 
 func (c *Cache) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post, error) {
@@ -22,25 +23,6 @@ func (c *Cache) CreatePost(ctx context.Context, post *domain.Post) (*domain.Post
 	if _, err := pipeline.Exec(ctx); err != nil {
 		return nil, err
 	}
-	//key := getKey(post.UserID)
-	//result, err := c.RDB.HSet(ctx, key, getField(post)).Result()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//fmt.Println(result)
-	//result, err = c.RDB.HSet(ctx, keyTemplateIndex, map[string]any{post.ID: post.UserID}).Result()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//fmt.Println(result)
-	//str, err := c.RDB.HGet(ctx, key, post.ID).Result()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//fmt.Println(str)
-	//if _, err := pipeline.Exec(ctx); err != nil {
-	//	return nil, err
-	//}
 	return post, nil
 }
 
@@ -127,4 +109,17 @@ func (c *Cache) FeedPost(ctx context.Context, offset int, limit int, userID int)
 		count++
 	}
 	return result, nil
+}
+
+func (r *Cache) Read(ctx context.Context, postId int, userId int) (int64, error) {
+	key := fmt.Sprintf(keyTemplatePostRead, postId)
+	_, err := r.RDB.SAdd(ctx, key, userId).Result()
+	if err != nil {
+		return 0, err
+	}
+	count, err := r.RDB.SCard(ctx, key).Result()
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
