@@ -40,6 +40,7 @@ services:
       - app_network
 networks:
   app_network:
+    external: true
 #  dialog:
 #    build:
 #      context: ./../server/monolit

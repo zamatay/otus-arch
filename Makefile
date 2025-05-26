@@ -5,6 +5,7 @@ DEPLOY_DIR = deploy
 PARAM := $(word 2, $(MAKECMDGOALS))
 DB_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=6432 host=localhost"
 DB_SHARD_STRING := "user=postgres dbname=facebook sslmode=disable password=postgres port=7432 host=localhost"
+NETWORK_NAME = app_network
 
 migrate_up:
 	@echo "Starting migrate"
@@ -37,16 +38,28 @@ fake:
 	@echo "Starting fake"
 	POSTGRES_PASSWORD=postgres docker-compose -f $(DEPLOY_DIR)/fake.yml up -d
 	@echo "end deploy"
-run:
+run: create-network
 	@echo "Starting run"
 	@echo "Starting deploy"
-	POSTGRES_PASSWORD=postgres docker-compose -f $(DEPLOY_DIR)/app.yml -f $(DEPLOY_DIR)/db.yml -f $(DEPLOY_DIR)/cache.yml -f $(DEPLOY_DIR)/kafka.yml -f $(DEPLOY_DIR)/sre.yml up --scale worker=2 --scale app=3 -d
+	NETWORK_NAME=$(NETWORK_NAME) POSTGRES_PASSWORD=postgres docker-compose -f $(DEPLOY_DIR)/app.yml -f $(DEPLOY_DIR)/db.yml -f $(DEPLOY_DIR)/cache.yml -f $(DEPLOY_DIR)/kafka.yml -f $(DEPLOY_DIR)/sre.yml up --scale worker=2 --scale app=3 -d
 	@echo "end deploy"
-stop:
+down:
 	@echo "Starting down"
 	docker-compose -f $(DEPLOY_DIR)/app.yml -f $(DEPLOY_DIR)/db.yml -f $(DEPLOY_DIR)/cache.yml -f $(DEPLOY_DIR)/kafka.yml -f $(DEPLOY_DIR)/sre.yml down
 	@echo "end down"
+stop: down clean-network
 build:
 	@echo "Starting build"
 	docker-compose -f $(DEPLOY_DIR)/app.yml -f $(DEPLOY_DIR)/db.yml -f $(DEPLOY_DIR)/cache.yml -f $(DEPLOY_DIR)/kafka.yml -f $(DEPLOY_DIR)/sre.yml build
 	@echo "end build"
+create-network:
+	@if [ -z "$$(docker network ls -q -f name=${NETWORK_NAME})" ]; then \
+		echo "Создание сети ${NETWORK_NAME}..."; \
+		docker network create ${NETWORK_NAME}; \
+	else \
+		echo "Сеть ${NETWORK_NAME} уже существует"; \
+	fi
+
+clean-network:
+	@echo "Удаление сети ${NETWORK_NAME}..."
+	-docker network rm ${NETWORK_NAME} 2>/dev/null || true
