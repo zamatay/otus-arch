@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
 	"github.com/zamatay/otus/arch/lesson-1/internal/api/grpcclient/counter"
 	"github.com/zamatay/otus/arch/lesson-1/internal/api/middleware"
 	"github.com/zamatay/otus/arch/lesson-1/internal/api/utils"
@@ -37,6 +39,7 @@ type Service struct {
 	uptime     time.Time
 	Grpc       *grpcserver.Service
 	CounterSrv *counter.CounterService
+	handleProm *middleware.HandleProm
 }
 
 func New(config *Config, secret string) (*Service, error) {
@@ -57,9 +60,12 @@ func New(config *Config, secret string) (*Service, error) {
 	utils.UserByToken = utils.SetUserByToken([]byte(secret))
 
 	srv.router.HandleFunc("/health", srv.healthCheckHandler)
+	srv.router.Handle("/metrics", promhttp.Handler())
 
 	srv.uptime = time.Now()
 	srv.ErrorCh = make(chan error)
+
+	srv.handleProm = middleware.NewHandleProm()
 	return srv, nil
 }
 
@@ -68,7 +74,7 @@ func (srv *Service) AddRoute(path string, handler func(http.ResponseWriter, *htt
 }
 
 func (srv *Service) AddProtectedRoute(path string, handler func(http.ResponseWriter, *http.Request)) {
-	srv.router.HandleFunc(path, middleware.CorsMiddleware(middleware.TokenMiddleware((handler))))
+	srv.router.HandleFunc(path, srv.handleProm.PrometheusMiddleware(middleware.CorsMiddleware(middleware.TokenMiddleware((handler)))))
 }
 
 func (srv *Service) AddHandle(path string, handler http.Handler) {
